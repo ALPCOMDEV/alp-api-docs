@@ -182,6 +182,14 @@ Returns information about all available currencies.
 
 # Pairs
 
+## Liquidity types
+
+Value | Status name | Description
+--------- |  ----------- | -----------
+10 | Standard | ...
+20 | Low | ...
+30 | Done | ...
+
 
 ## List all pairs
 
@@ -205,12 +213,14 @@ request.get('https://alp.com/api/v1/pairs/', function (error, response, body) {
 ```json
 [
   {
+    "name": "BTC_USD",
+    "currency1": "BTC",
     "currency2": "USD",
+    "price_precision": 2,
+    "amount_precision": 6,
     "maximum_order_size": 100000000.00000000,
     "minimum_order_size": 0.00000001,
-    "currency1": "BTC",
-    "name": "BTC_USD",
-    "price_precision": 3
+    "liquidity_type": 10
    }
 ]
 ```
@@ -416,13 +426,13 @@ params = {
     limit_asks: 1,
 }
 
-response = requests.get('https://alp.com/api/v1/orderbook/BTC_USD/', params=params)
+response = requests.get('https://alp.com/api/v1/orderbook/BTC_USD', params=params)
 ```
 
 ```javascript
 var request = require('request');
 
-var url = 'https://alp.com/api/v1/orderbook/BTC_USD/';
+var url = 'https://alp.com/api/v1/orderbook/BTC_USD';
 
 var params = {
     limit_bids: 1,
@@ -435,30 +445,7 @@ request.get({url: url, qs: params}, function (error, response, body) {
 );
 ```
 
-> Sample output when grouping disabled
-
-```json
-{
-  "sell": [
-    {
-      "price": 911.519,
-      "id": 44667,
-      "amount": 0.000446,
-      "timestamp": 1485777324.410015
-     }
-   ],
-  "buy": [
-    {
-      "price": 911.122,
-      "id": 44647,
-      "amount": 0.001233,
-      "timestamp": 1485777124.415542
-    }
-  ]
-}
-```
-
-> Sample output when grouping enabled
+> Sample output
 
 ```json
 {
@@ -481,7 +468,7 @@ Get full orderbook of **active** orders
 
 ### HTTP Request
 
-`GET https://alp.com/api/v1/orderbook/<pair_name>/`
+`GET https://alp.com/api/v1/orderbook/<pair_name>`
 
 ### Query Parameters
 
@@ -567,12 +554,15 @@ request.get('https://alp.com/api/v1/order/' + oid + '/', function (error, respon
 
 ```json
 {
-  "amount": 0.1250000,
+  "id": 11259,
+  "date": 1478025717394,
   "pair": "BTC_USD",
   "type": "buy",
-  "status": "1",
   "price": 870.69000000,
-  "id": 11259
+  "amount": 0.1250000,
+  "amount_filled": "0.00419580",
+  "amount_original": 0.0041958,
+  "status": "1"
 }
 ```
 
@@ -743,6 +733,7 @@ request.get('https://alp.com/api/v1/exchanges/', function (error, response, body
 [
   {
     "id": 6030,
+    "account_id": 384360,
     "price": 839.36000000,
     "pair": "BTC_USD",
     "type": "sell",
