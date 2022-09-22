@@ -258,31 +258,7 @@ We have limit in 2 calls per second from single account to authorization require
 <p>Returns information about all available currencies.</p>
 <h3 id='http-request'>HTTP Request</h3>
 <p><code>GET https://alp.com/api/v1/currencies/</code></p>
-<h1 id='pairs'>Pairs</h1><h2 id='liquidity-types'>Liquidity types</h2>
-<table><thead>
-<tr>
-<th>Value</th>
-<th>Status name</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>10</td>
-<td>Standard</td>
-<td>...</td>
-</tr>
-<tr>
-<td>20</td>
-<td>Low</td>
-<td>...</td>
-</tr>
-<tr>
-<td>30</td>
-<td>Done</td>
-<td>...</td>
-</tr>
-</tbody></table>
-<h2 id='list-all-pairs'>List all pairs</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<h1 id='pairs'>Pairs</h1><h2 id='list-all-pairs'>List all pairs</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/pairs/'</span><span class="p">)</span>
 </code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
