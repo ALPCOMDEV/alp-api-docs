@@ -177,7 +177,7 @@ Returns information about all available currencies.
 
 ### HTTP Request
 
-`GET https://alp.com/api/v1/pairs/`
+`GET https://alp.com/api/v1/currencies/`
 
 
 # Pairs
