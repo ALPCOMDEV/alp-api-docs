@@ -182,15 +182,6 @@ Returns information about all available currencies.
 
 # Pairs
 
-## Liquidity types
-
-Value | Status name | Description
---------- |  ----------- | -----------
-10 | Standard | ...
-20 | Low | ...
-30 | Done | ...
-
-
 ## List all pairs
 
 
