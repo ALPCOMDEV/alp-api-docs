@@ -8,4 +8,4 @@ jobs:
     - name: Build documentation
       uses: docker://decathlon/slate-builder-action:2.0.0
       env:
-        DOC_BASE_FOLDER = "source"
+        DOC_BASE_FOLDER = "."
