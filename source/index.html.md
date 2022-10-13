@@ -15,16 +15,13 @@ includes:
 search: true
 ---
 
-
 # Introduction
-
 
 Welcome to ALP.COM API docs!
 
 Service ALP.COM provides open API for trading operations and broadcasting of all trading events.
 
 # HTTP API (v1)
-
 
 HTTP API endpoint available on [https://alp.com/api/v1/](https://alp.com/api/v1/).
 
@@ -58,31 +55,33 @@ def get_auth_headers(self, data):
 ```
 
 ```javascript
-const hmacSha256 = require('crypto-js/hmac-sha256'); // sha256 hash. or use you favorite u like
-const request = require('request'); // for http requests. or use you favorite u like
+const hmacSha256 = require("crypto-js/hmac-sha256"); // sha256 hash. or use you favorite u like
+const request = require("request"); // for http requests. or use you favorite u like
 
-const BASE_URL = 'https://alp.com/api/v1';
-const API_KEY = '0000-0000...';
-const SECRET = 'Z%2........';
+const BASE_URL = "https://alp.com/api/v1";
+const API_KEY = "0000-0000...";
+const SECRET = "Z%2........";
 
 //Serialize for singing only. Can be used in request body if u like urlencoded form format instead of json
 function serializePayload(payload) {
-  return Object
-    .keys(payload) // get keys of payload object
+  return Object.keys(payload) // get keys of payload object
     .sort() // sort keys
     .map((key) => key + "=" + encodeURIComponent(payload[key])) // each value should be url encoded. the most sensitive part for sign checking
-    .join('&'); // to sting, separate with ampersand
+    .join("&"); // to sting, separate with ampersand
 }
 
 // Generates auth headers
 function getAuthHeaders(payload) {
   // get SHA256 of <API_KEY><sorted urlencoded payload string><SECRET>
-  const sign = hmacSha256(API_KEY + serializePayload(payload), SECRET).toString();
+  const sign = hmacSha256(
+    API_KEY + serializePayload(payload),
+    SECRET
+  ).toString();
 
   return {
-    'X-KEY': API_KEY,
-    'X-SIGN': sign,
-    'X-NONCE': Date.now()
+    "X-KEY": API_KEY,
+    "X-SIGN": sign,
+    "X-NONCE": Date.now(),
   };
 }
 
@@ -90,9 +89,9 @@ function getWallets(callback) {
   payload = {};
 
   const options = {
-    method: 'get',
+    method: "get",
     url: `${BASE_URL}/wallets/`,
-    headers: getAuthHeaders(payload)
+    headers: getAuthHeaders(payload),
   };
 
   request(options, callback);
@@ -100,7 +99,7 @@ function getWallets(callback) {
 
 function createOrder(order, callback) {
   const options = {
-    method: 'post',
+    method: "post",
     url: `${BASE_URL}/order/`,
     headers: getAuthHeaders(order),
     form: order, // API accepts urlencoded form or json. Use appropriate headers!
@@ -111,21 +110,21 @@ function createOrder(order, callback) {
 
 // test
 getWallets((error, response, body) => {
-  console.log('error', error);
-  console.log('body', body);
+  console.log("error", error);
+  console.log("body", body);
 });
 
 const order = {
-  type: 'buy',
-  pair: 'BTC_USD',
-  amount: '0.0001',
-  price: '0.1'
+  type: "buy",
+  pair: "BTC_USDT",
+  amount: "0.0001",
+  price: "0.1",
 };
 
 createOrder(order, (error, response, body) => {
   // get json, etc
-  console.log('error', error);
-  console.log('body', body);
+  console.log("error", error);
+  console.log("body", body);
 });
 ```
 
@@ -133,16 +132,13 @@ In order for access to private API methods, generate authorization keys [in prof
 
 All request to these methods must contain the following headers:
 
-* X-KEY - your key.
-* X-SIGN - query's POST data, sorted by keys and signed by your key's "secret" according to the HMAC-SHA256 method.
-* X-NONCE - integer value, must be greater then nonce in previous api call.
-
+- X-KEY - your key.
+- X-SIGN - query's POST data, sorted by keys and signed by your key's "secret" according to the HMAC-SHA256 method.
+- X-NONCE - integer value, must be greater then nonce in previous api call.
 
 # Currencies
 
-
 ## List all currencies
-
 
 ```python
 import requests
@@ -151,11 +147,14 @@ response = requests.get('https://alp.com/api/v1/currencies/')
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get('https://alp.com/api/v1/currencies/', function (error, response, body) {
+request.get(
+  "https://alp.com/api/v1/currencies/",
+  function (error, response, body) {
     // process response
-});
+  }
+);
 ```
 
 > Sample output
@@ -163,12 +162,12 @@ request.get('https://alp.com/api/v1/currencies/', function (error, response, bod
 ```json
 [
   {
-    "sign": "Ƀ",
-    "short_name": "BTC"
+    "sign": "BTC",
+    "short_name": "Bitcoin"
   },
   {
-    "sign": "Ξ",
-    "short_name": "ETH"
+    "sign": "ETH",
+    "short_name": "Ethereum"
   }
 ]
 ```
@@ -179,11 +178,9 @@ Returns information about all available currencies.
 
 `GET https://alp.com/api/v1/currencies/`
 
-
 # Pairs
 
 ## List all pairs
-
 
 ```python
 import requests
@@ -192,10 +189,10 @@ response = requests.get('https://alp.com/api/v1/pairs/')
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get('https://alp.com/api/v1/pairs/', function (error, response, body) {
-    // process response
+request.get("https://alp.com/api/v1/pairs/", function (error, response, body) {
+  // process response
 });
 ```
 
@@ -204,15 +201,15 @@ request.get('https://alp.com/api/v1/pairs/', function (error, response, body) {
 ```json
 [
   {
-    "name": "BTC_USD",
+    "name": "BTC_USDT",
     "currency1": "BTC",
     "currency2": "USD",
-    "price_precision": 2,
+    "price_precision": 3,
     "amount_precision": 6,
-    "maximum_order_size": 100000000.00000000,
-    "minimum_order_size": 0.00000001,
-    "liquidity_type": 10
-   }
+    "maximum_order_size": 100000000,
+    "minimum_order_size": 0.0005,
+    "minimum_order_value": 5
+  }
 ]
 ```
 
@@ -224,15 +221,12 @@ Returns information about all available pairs.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-currency1 | all | Filter by first currency.
-currency2 | all | Filter by second currency.
-
+| Parameter | Default | Description                |
+| --------- | ------- | -------------------------- |
+| currency1 | all     | Filter by first currency.  |
+| currency2 | all     | Filter by second currency. |
 
 # Tickers
-
-
 
 ```python
 import requests
@@ -241,10 +235,10 @@ response = requests.get('https://alp.com/api/v1/ticker/')
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get('https://alp.com/api/v1/ticker/', function (error, response, body) {
-    // process response
+request.get("https://alp.com/api/v1/ticker/", function (error, response, body) {
+  // process response
 });
 ```
 
@@ -274,11 +268,12 @@ Used to fetch last price changes.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-pair | all | Filter by pair symbol(e.g. BTC_USD)
+| Parameter | Default | Description                          |
+| --------- | ------- | ------------------------------------ |
+| pair      | all     | Filter by pair symbol(e.g. BTC_USDT) |
 
 # Charts
+
 ```python
 import requests
 
@@ -286,20 +281,22 @@ params = {
     'limit': 1
     }
 
-response = requests.get('https://alp.com/api/charts/BTC_USD/60/chart', params = params)
+response = requests.get('https://alp.com/api/v1/charts/BTC_USDT/15/chart', params = params)
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-var params = {limit: 1};
+var params = { limit: 1 };
 
-request.get({
-                url: 'https://alp.com/api/charts/BTC_USD/60/chart',
-                qs: params
-            }, function (error, response, body) {
-                // process response
-            }
+request.get(
+  {
+    url: "https://alp.com/api/v1/charts/BTC_USDT/15/chart",
+    qs: params,
+  },
+  function (error, response, body) {
+    // process response
+  }
 );
 ```
 
@@ -308,41 +305,40 @@ request.get({
 ```json
 [
   {
-    "volume": 0.262929,
-    "high": 912.236,
-    "low": 910.086,
-    "close": 911.915,
-    "time": 1485777600,
-    "open": 910.424
-   }
+    "time": 1665622800,
+    "open": 19138,
+    "close": 19117.54,
+    "low": 19117.54,
+    "high": 19165.19,
+    "volume": 1921.249811
+  }
 ]
 ```
 
 ### Timeframes
 
-Value | Description
---------- | -------
-5 | 5 minutes
-15 | 15 minutes
-30 | 30 minutes
-60 | 1 hour
-240 | 4 hours
-D | 1 day
+| Value | Description |
+| ----- | ----------- |
+| 5     | 5 minutes   |
+| 15    | 15 minutes  |
+| 30    | 30 minutes  |
+| 60    | 1 hour      |
+| 240   | 4 hours     |
+| D     | 1 day       |
 
 ### HTTP Request
 
-`GET https://alp.com/api/charts/<pair_symbol>/<timeframe>/chart`
+`GET https://alp.com/api/v1/charts/<pair_symbol>/<timeframe>/chart`
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-limit | 720 | Limiting results
-since | - | Since Timestamp
-until | - | Until Timestamp
+| Parameter | Default | Description      |
+| --------- | ------- | ---------------- |
+| limit     | 720     | Limiting results |
+| since     | -       | Since Timestamp  |
+| until     | -       | Until Timestamp  |
 
 # Wallets
-
 
 ## List own wallets
 
@@ -352,18 +348,17 @@ import requests
 response = requests.get('https://alp.com/api/v1/wallets/', headers = get_auth_headers({}))
 ```
 
-
 ```javascript
-var request = require('request');
+var request = require("request");
 
 request.get(
-    'https://alp.com/api/v1/wallets/',
-    {
-        headers: getAuthHeaders({})
-    },
-    function (error, response, body) {
-        // process response
-    }
+  "https://alp.com/api/v1/wallets/",
+  {
+    headers: getAuthHeaders({}),
+  },
+  function (error, response, body) {
+    // process response
+  }
 );
 ```
 
@@ -373,9 +368,9 @@ request.get(
 [
   {
     "currency": "BTC",
-    "balance": 0.00000000,
-    "reserve": 0.00000000
-   }
+    "balance": 0.0,
+    "reserve": 0.0
+  }
 ]
 ```
 
@@ -387,25 +382,23 @@ Returns information about all wallets of account.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-currency_id | all | Filter by currency.
+| Parameter   | Default | Description         |
+| ----------- | ------- | ------------------- |
+| currency_id | all     | Filter by currency. |
 
 <aside class="warning">
 This method requires authorization.
 </aside>
 
-
 # Orders
 
 ## Order statuses
 
-Value | Status name | Description
---------- |  ----------- | -----------
-1 | Active | Order in queue for executing
-2 | Canceled | Order not active, permanently
-3 | Done | Order fully executed
-
+| Value | Status name | Description                   |
+| ----- | ----------- | ----------------------------- |
+| 1     | Active      | Order in queue for executing  |
+| 2     | Canceled    | Order not active, permanently |
+| 3     | Done        | Order fully executed          |
 
 ## Get orderbook
 
@@ -417,23 +410,22 @@ params = {
     limit_asks: 1,
 }
 
-response = requests.get('https://alp.com/api/v1/orderbook/BTC_USD', params=params)
+response = requests.get('https://alp.com/api/v1/orderbook/BTC_USDT', params=params)
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-var url = 'https://alp.com/api/v1/orderbook/BTC_USD';
+var url = "https://alp.com/api/v1/orderbook/BTC_USDT";
 
 var params = {
-    limit_bids: 1,
-    limit_asks: 1
+  limit_bids: 1,
+  limit_asks: 1,
 };
 
-request.get({url: url, qs: params}, function (error, response, body) {
-        // process response
-    }
-);
+request.get({ url: url, qs: params }, function (error, response, body) {
+  // process response
+});
 ```
 
 > Sample output
@@ -442,14 +434,14 @@ request.get({url: url, qs: params}, function (error, response, body) {
 {
   "sell": [
     {
-      "price": 911.519,
-      "amount": 0.000446
-     }
-   ],
+      "price": 19152,
+      "amount": 1.957916
+    }
+  ],
   "buy": [
     {
-      "price": 911.122,
-      "amount": 0.001233
+      "price": 19133,
+      "amount": 2.499131
     }
   ]
 }
@@ -463,12 +455,11 @@ Get full orderbook of **active** orders
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-limit_sell | all | Sell orders limit
-limit_buy | all | Buy orders limit
-group | 0 | If set 1, then order will grouped by price
-
+| Parameter  | Default | Description                                |
+| ---------- | ------- | ------------------------------------------ |
+| limit_sell | all     | Sell orders limit                          |
+| limit_buy  | all     | Buy orders limit                           |
+| group      | 0       | If set 1, then order will grouped by price |
 
 ## List own orders
 
@@ -479,11 +470,15 @@ response = requests.get('https://alp.com/api/v1/orders/own/', headers = get_auth
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get('https://alp.com/api/v1/orders/own/', {headers: getAuthHeaders({})}, function (error, response, body) {
+request.get(
+  "https://alp.com/api/v1/orders/own/",
+  { headers: getAuthHeaders({}) },
+  function (error, response, body) {
     // process response
-});
+  }
+);
 ```
 
 > Sample output
@@ -491,11 +486,11 @@ request.get('https://alp.com/api/v1/orders/own/', {headers: getAuthHeaders({})},
 ```json
 [
   {
-    "amount": 0.500000000,
+    "amount": 0.5,
     "pair": "ETH_USD",
     "type": "buy",
     "status": 3,
-    "price": 0.00113000,
+    "price": 0.00113,
     "id": 11249
   }
 ]
@@ -513,15 +508,14 @@ List all orders created in your account. Can be filtered by query parameters.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-type | all | Filter by orders type (sell or buy).
-pair | none | Filter by pair.
-status | all | Filter by status.
-limit | 2000 | Limiting results.
+| Parameter | Default | Description                          |
+| --------- | ------- | ------------------------------------ |
+| type      | all     | Filter by orders type (sell or buy). |
+| pair      | none    | Filter by pair.                      |
+| status    | all     | Filter by status.                    |
+| limit     | 2000    | Limiting results.                    |
 
 ## Retrieve single order
-
 
 ```python
 import requests
@@ -532,13 +526,16 @@ response = requests.get('https://alp.com/api/v1/order/{}/'.format(oid))
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
 var oid = 53189;
 
-request.get('https://alp.com/api/v1/order/' + oid + '/', function (error, response, body) {
+request.get(
+  "https://alp.com/api/v1/order/" + oid + "/",
+  function (error, response, body) {
     // process response
-});
+  }
+);
 ```
 
 > Sample output
@@ -547,10 +544,10 @@ request.get('https://alp.com/api/v1/order/' + oid + '/', function (error, respon
 {
   "id": 11259,
   "date": 1478025717394,
-  "pair": "BTC_USD",
+  "pair": "BTC_USDT",
   "type": "buy",
-  "price": 870.69000000,
-  "amount": 0.1250000,
+  "price": 870.69,
+  "amount": 0.125,
   "amount_filled": "0.00419580",
   "amount_original": 0.0041958,
   "status": "1"
@@ -563,16 +560,14 @@ Get detailed information about order by its id
 
 `GET https://alp.com/api/v1/order/<pk>/`
 
-
 ## Create order
-
 
 ```python
 import requests
 
 order = {
     type: 'buy',
-    pair: 'BTC_USD',
+    pair: 'BTC_USDT',
     amount: '1.0',
     price: '870.69'
 }
@@ -581,23 +576,25 @@ response = requests.post('https://alp.com/api/v1/order/', data = order, headers 
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
 var order = {
-    type: 'buy',
-    pair: 'BTC_USD',
-    amount: '1.0',
-    price: '870.69'
+  type: "buy",
+  pair: "BTC_USDT",
+  amount: "1.0",
+  price: "870.69",
 };
 
-request.post({
-                url: 'https://alp.com/api/v1/order/',
-                form: order,
-                headers: getAuthHeaders(order)
-            }, function (error, response, body) {
-                // process response
-                // save order id, check if it's executed
-            }
+request.post(
+  {
+    url: "https://alp.com/api/v1/order/",
+    form: order,
+    headers: getAuthHeaders(order),
+  },
+  function (error, response, body) {
+    // process response
+    // save order id, check if it's executed
+  }
 );
 ```
 
@@ -609,14 +606,14 @@ request.post({
   "type": "buy",
   "date": 1483721079.51632,
   "oid": 11268,
-  "price": 870.69000000,
-  "amount": 0.00000000,
+  "price": 870.69,
+  "amount": 0.0,
   "trades": [
     {
       "type": "sell",
-      "price": 870.69000000,
+      "price": 870.69,
       "o_id": 11266,
-      "amount": 0.00010000,
+      "amount": 0.0001,
       "tid": 6049
     }
   ]
@@ -635,16 +632,14 @@ Create new order that will be automatically executed.
 
 ### POST params
 
-Parameter | Description
---------- | -----------
-type | Type of order (`sell` or `buy`).
-pair | Pair of order
-amount | Amount of first currency of pair.
-price | Price of order. This param have limited precision (See [pairs](#pairs)).
-
+| Parameter | Description                                                              |
+| --------- | ------------------------------------------------------------------------ |
+| type      | Type of order (`sell` or `buy`).                                         |
+| pair      | Pair of order                                                            |
+| amount    | Amount of first currency of pair.                                        |
+| price     | Price of order. This param have limited precision (See [pairs](#pairs)). |
 
 ## Cancel order
-
 
 ```python
 import requests
@@ -657,19 +652,21 @@ response = requests.post('https://alp.com/api/v1/order-cancel/', data = data, he
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
 var data = {
-    order: 63568
+  order: 63568,
 };
 
-request.post({
-        url: 'https://alp.com/api/v1/order-cancel/',
-        form: data,
-        headers: getAuthHeaders(data)
-    }, function (error, response, body) {
-        // process response
-    }
+request.post(
+  {
+    url: "https://alp.com/api/v1/order-cancel/",
+    form: data,
+    headers: getAuthHeaders(data),
+  },
+  function (error, response, body) {
+    // process response
+  }
 );
 ```
 
@@ -693,16 +690,13 @@ Cancel your **active** order. If order not exists, it's done or cancelled error 
 
 ### POST params
 
-Parameter | Description
---------- | -----------
-order | ID of order to cancel
-
+| Parameter | Description           |
+| --------- | --------------------- |
+| order     | ID of order to cancel |
 
 # Exchanges
 
-
 ## List all exchanges
-
 
 ```python
 import requests
@@ -711,11 +705,14 @@ response = requests.get('https://alp.com/api/v1/exchanges/')
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get('https://alp.com/api/v1/exchanges/', function (error, response, body) {
+request.get(
+  "https://alp.com/api/v1/exchanges/",
+  function (error, response, body) {
     // process response
-});
+  }
+);
 ```
 
 > Sample output
@@ -723,17 +720,16 @@ request.get('https://alp.com/api/v1/exchanges/', function (error, response, body
 ```json
 [
   {
-    "id": 6030,
+    "id": 1158080717,
     "account_id": 384360,
-    "price": 839.36000000,
-    "pair": "BTC_USD",
-    "type": "sell",
-    "timestamp": 1483705817.735508,
-    "amount": 0.00281167
+    "price": 19100.11,
+    "amount": 0.019325,
+    "timestamp": 1665625.95392,
+    "pair": "BTC_USDT",
+    "type": "sell"
   }
 ]
 ```
-
 
 ### HTTP Request
 
@@ -741,13 +737,12 @@ request.get('https://alp.com/api/v1/exchanges/', function (error, response, body
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-pair | all | Filter by pair.
-limit | 100 | Limiting results.
-offset | 0 | Skip number of records.
-ordering | -id | Ordering parameter. `id` - ascending sorting, `-id` - descending sorting.
-
+| Parameter | Default | Description                                                               |
+| --------- | ------- | ------------------------------------------------------------------------- |
+| pair      | all     | Filter by pair.                                                           |
+| limit     | 100     | Limiting results.                                                         |
+| offset    | 0       | Skip number of records.                                                   |
+| ordering  | -id     | Ordering parameter. `id` - ascending sorting, `-id` - descending sorting. |
 
 ## List own exchanges
 
@@ -763,17 +758,15 @@ List only own exchanges where your account was buyer or seller.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-type | all | Filter by orders type (sell or buy).
-pair | all | Filter by pair.
-limit | 100 | Limiting results.
-offset | 0 | Skip number of records.
-ordering | -id | Ordering parameter. `id` - ascending sorting, `-id` - descending sorting.
-
+| Parameter | Default | Description                                                               |
+| --------- | ------- | ------------------------------------------------------------------------- |
+| type      | all     | Filter by orders type (sell or buy).                                      |
+| pair      | all     | Filter by pair.                                                           |
+| limit     | 100     | Limiting results.                                                         |
+| offset    | 0       | Skip number of records.                                                   |
+| ordering  | -id     | Ordering parameter. `id` - ascending sorting, `-id` - descending sorting. |
 
 # Deposits
-
 
 ## List own deposits
 
@@ -784,14 +777,16 @@ response = requests.get('https://alp.com/api/v1/deposits/', headers = get_auth_h
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get({
-                url: 'https://alp.com/api/v1/deposits/',
-                headers: getAuthHeaders({})
-            }, function (error, response, body) {
-                // process response
-            }
+request.get(
+  {
+    url: "https://alp.com/api/v1/deposits/",
+    headers: getAuthHeaders({}),
+  },
+  function (error, response, body) {
+    // process response
+  }
 );
 ```
 
@@ -801,7 +796,7 @@ request.get({
     "timestamp": 1485363039.18359,
     "id": 317,
     "currency": "BTC",
-    "amount": 530.00000000
+    "amount": 530.0
   }
 ]
 ```
@@ -816,18 +811,17 @@ List your deposits
 
 `GET https://alp.com/api/v1/deposits/`
 
-
 # Withdraws
 
 ## Withdraw statuses
 
-Value | Status name | Description
---------- | ----------- | -----------
-10 | New | Withdraw created, verification need
-20 | Verified | Withdraw verified, waiting for approving
-30 | Approved | Approved by moderator
-40 | Refused | Refused by moderator. See your email for more details
-50 | Canceled | Cancelled by user
+| Value | Status name | Description                                           |
+| ----- | ----------- | ----------------------------------------------------- |
+| 10    | New         | Withdraw created, verification need                   |
+| 20    | Verified    | Withdraw verified, waiting for approving              |
+| 30    | Approved    | Approved by moderator                                 |
+| 40    | Refused     | Refused by moderator. See your email for more details |
+| 50    | Canceled    | Cancelled by user                                     |
 
 ## List own made withdraws
 
@@ -838,14 +832,16 @@ response = requests.get('https://alp.com/api/v1/withdraws/', headers: get_auth_h
 ```
 
 ```javascript
-var request = require('request');
+var request = require("request");
 
-request.get({
-        url: 'https://alp.com/api/v1/withdraws/',
-        headers: getAuthHeaders({})
-    }, function (error, response, body) {
-        // process response
-    }
+request.get(
+  {
+    url: "https://alp.com/api/v1/withdraws/",
+    headers: getAuthHeaders({}),
+  },
+  function (error, response, body) {
+    // process response
+  }
 );
 ```
 
@@ -857,7 +853,7 @@ request.get({
     "id": 403,
     "timestamp": 1485363466.868539,
     "currency": "BTC",
-    "amount": 0.53000000,
+    "amount": 0.53,
     "status": 20
   }
 ]
@@ -875,7 +871,7 @@ Get list of your withdraws
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-currency_id | all | Filter currency.
-status | all | Filter by status.
+| Parameter   | Default | Description       |
+| ----------- | ------- | ----------------- |
+| currency_id | all     | Filter currency.  |
+| status      | all     | Filter by status. |
