@@ -879,3 +879,623 @@ Parameter | Default | Description
 --------- | ------- | -----------
 currency_id | all | Filter currency.
 status | all | Filter by status.
+
+# API v3
+
+# *Private API*
+
+## Auth
+Authentication keys must be provided for each endpoint call.
+You need to include valid `api-secret` and `api-key` you have generated for your account.
+> **Warning**
+>
+> functionality are in progress
+
+## Fee Info
+
+`GET /api/v3/feeinfo`
+
+Response
+
+`200` -
+```json
+[{
+  "name": "account name",
+  "account_id": 25,
+  "is_active": true,
+  "currency": "USDT", #may be empty
+  "pair": "BTC_USDT", #may be empty
+  "taker_fee_rate": 0.02,
+  "maker_fee_rate": 0.01,
+  "fee_currency": "USDT",
+  "priority": 1
+}...]
+```
+`401`
+
+## Orders
+
+### GET
+
+`GET /api/v3/orders`
+
+Query Parameters
+
+| Parameter  | Type    | Description|
+|------------|---------| -----------|
+| pair       | string  | pair symbol like `BTC_USDT`|
+| open_only  | bool    | if set and true returns open order only|
+| side       | string  | if set must be rather `BUY` or `SELL`|
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
+|  end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 76575,
+  "account_id": 25,
+  "pair": "BTC_USDT",
+  "wallet_type": "SPOT",
+  "side": "BUY",
+  "type": "LIMIT",
+  "tif": "GTC",
+  "price": 20450.05,
+  "stop_price": 0, #used if type is stop
+  "amount": 0.05, #amount in base currency
+  "amount_filled": 0,
+  "amount_cancelled": 0,
+  "status": "OPEN",
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "updated_at": "2022-10-06T08:28:06.801064-04:00",
+  "open_at": "",
+  "expire_after": "",
+  "done_at": ""
+}...]
+```
+`400`,
+`401`
+
+### POST
+
+`POST /api/v3/orders`
+
+Query Body
+
+```json
+{
+  "account_id": 25,
+  "wallet_type": "SPOT",
+  "pair": "BTC_USDT",
+  "order_side": "SELL",
+  "order_type": "LIMIT",
+  "tif": "GTC",
+  "expire_after": "", #may be empty
+  "side_effect": "", #may be empty or AUTO_BORROW, AUTO_REPAY
+  "limit_price": 25750.45,
+  "base_amount": 0.1,  # required for limit types
+  "quote_amount": 0, # allowed for market types only
+  "stop_price": 0, # for stop order only
+  "stop_operator": "", # for stop order only, may be GTE or LTE
+  "client_order_id": "jkndijejnmjn2554562",
+  "valid_till": "" #if set matching engine should start processing before
+}
+```
+
+Response
+
+`201` -
+```
+34
+```
+(order_id)
+
+`400`, `401`
+
+### DELETE
+
+`DELETE /api/v3/orders`
+
+Query Body
+
+```json
+{
+  "order_ids": [1, 5, 8],
+  "all": false,
+  "pair": ""
+}
+```
+> **Note**
+>
+> rather `order_ids` or `all`=`true` must be specified. If `all`=`true`, `pair` can be specified to cancel all orders for one specific pair
+
+Response
+
+`202`,
+`204` (no orders to cancels by specified params),
+`400`, `401`
+
+## Accounts
+
+### GET
+
+`GET /api/v3/accounts`
+
+Query Parameters
+
+Parameter | Type    | Description
+--------- |---------| -----------
+include_subaccounts | bool | if set true, all subaccounts for account are returned as well
+
+Response
+
+`200` -
+```json
+[{
+  "id": 25,
+  "name": "account name",
+  "email": "test_user_email@gmail.com",
+  "id_parent": 0, #if it is subbaccount, parent id will be set
+}...]
+```
+`401`
+
+## Account Trades
+
+### GET
+
+`GET /api/v3/accounts/trades`
+
+Query Parameters
+
+
+Parameter | Type    |   Description
+--------- |---------| ----------------------
+pair | string  | pair symbol like `BTC_USDT`
+side | string  | if set must be rather `BUY` or `SELL`
+start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`
+end_time | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "status": "FILLED", #status for account order set after trade
+  "side": "BUY",
+  "type": "LIMIT",
+  "price": 23400.34,
+  "amount": 0.05,
+  "amount_unfilled": 0,
+  "fee_rate": 0.001,
+  "fee_amount": 1.170017,
+  "is_maker": true,
+  "account_id": 25,
+  "currency": "USDT", #may be empty
+  "pair": "BTC_USDT",
+  "fee_currency": "USDT",
+  "wallet_type": "SPOT"
+}...]
+```
+`400`, `401`
+
+
+
+## Account Balances
+
+### GET
+
+`GET /api/v3/accounts/balances`
+
+Response
+
+`200` -
+```json
+[{
+  "account_id": 25,
+  "balance": 2000.0,
+  "reserve": 500.0, #locked in orders
+  "currency": "USDT",
+  "pair": "BTC_USDT", #may be empty
+  "wallet_type": "SPOT",
+  "last_update_at": "2022-10-06T08:28:06.801064-04:00"
+}...]
+```
+`401`
+
+
+## Wallet Activity
+
+### GET
+
+`GET /api/v3/wallets/activity`
+
+Query Parameters
+
+| Parameter  | Type    |   Description|
+|------------|---------| ----------------------|
+| currency   | string  | currency symbol like `BTC`|
+| side       | string  | if set must be rather `BUY` or `SELL`|
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
+|  end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 12,
+  "account_id": 25,
+  "currency": "USDT",
+  "pair": "USDT_BTC",
+  "wallet_id": 3,
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "type": "MOTION_TYPE_ORDER",
+  "balance": 10000.0,
+  "balance_delta": 1500.0,
+  "reserve": 500.0,
+  "reserve_delta": -1500.0,
+  "balance_end": 9500.0,
+  "reserve_end": 500.0,
+  "wallet_type": "SPOT"
+}...]
+```
+`400`, `401`
+
+
+
+## Margin
+
+### GET
+
+`GET /api/v3/margin`
+
+Query Parameters
+
+| Parameter  | Type | Description|
+|------------|--| -----------|
+| isolated_margin | bool |  if set true isolated margin positions are returned |
+| cross_margin   | bool |  if set true cross margin positions are returned |
+
+> **Note**
+>
+> rather `isolated_margin` or `cross_margin` must be set true
+
+Response
+
+`200` -
+```json
+[{
+  "id": 38237,
+  "account_id": 25,
+  "wallet_type": "ISOLATED_MARGIN",
+  "interest": 0.003,
+  "currecny": "ETH",
+  "borrowed": 0.3,
+  "pair": "BTC_ETH", #used for ISOLATED_MARGIN only
+}...]
+```
+`400`,
+`401`
+
+### DELETE
+
+`DELETE /api/v3/margin`
+
+Query Body
+
+```json
+{
+  "pair": "BTC_USDT",
+  "wallet_type": "ISOLATED_MARGIN"
+}
+```
+
+> **Note**
+>
+> rather `ISOLATED_MARGIN` or `CROSS_MARGIN` must be set to `wallet_type`
+
+
+Response
+
+`202`, `400`, `401`
+
+
+## Margin Borrow
+
+### GET
+
+`GET /api/v3/margin/borrow`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| open_only  | bool    | if set and true returns open order only                     |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 3636,
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "type": "LOAN_MANUAL",
+  "wallet_type": "ISOLATED_MARGIN",
+  "opened_at": "2022-10-06T08:28:06.801064-04:00",
+  "closed_at": "", #set on borrow closing
+  "borrowed": 0.03,
+  "repaid": 0,
+  "interest_rate": 0.0001,
+  "interest_accrued": 0.0002,
+  "interest_paid": 0.0002,
+  "account_id": 25,
+  "currency": "ETH",
+  "pair": "BTC_ETH", # empty for CROSS_MARGIN
+  "last_interest_at": "2022-10-06T10:28:06.801064-04:00"
+}...]
+```
+`400`,
+`401`
+
+### POST
+
+`POST /api/v3/margin/borrow`
+
+Query Body
+
+```json
+{
+  "currency": "ETH",
+  "pair": "", #may be empty for CROSS_MARGIN
+  "wallet_type": "CROSS_MARGIN",
+  "type": "LOAN_MANUAL", #or LOAN_AUTO
+  "borrow": 0.3
+}
+```
+
+Response
+
+`200`, `400`, `401`
+
+## Margin Transfer
+
+### GET
+
+`GET /api/v3/margin/transfer`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 30930,
+  "account_id": 25,
+  "wallet_type": "ISOLATED_MARGIN",
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "direction": "ADD", #ADD or SUB
+  "currency": "ETH",
+  "pair": "ETH_BTC",
+  "amount": 0.02,
+  "note": "test isolated margin transfer"
+}...]
+```
+`400`,
+`401`
+
+### POST
+
+`POST /api/v3/margin/transfer`
+
+Query Body
+
+```json
+{
+  "wallet_type": "CROSS_MARGIN",
+  "direction": "SUB", #ADD or SUB
+  "currency": "ETH",
+  "amount": 0.02,
+  "pair": "", #must be set for ISOLATED_MARGIN
+  "note": "test transfer note"
+}
+```
+
+Response
+
+`200`, `400`, `401`
+
+## Margin Repay
+
+### GET
+
+`GET /api/v3/margin/repay`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 30930,
+  "account_id": 25,
+  "wallet_type": "ISOLATED_MARGIN",
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "type": "LOAN_MANUAL", #LOAN_MANUAL or LOAN_AUTO
+  "currency": "ETH",
+  "pair": "ETH_BTC", #empty for CROSS_MARGIN
+  "principal_amount": 0.02,
+  "interest_amount": 0.0005,
+  "borrow_id": 283
+}...]
+```
+`400`,
+`401`
+
+### POST
+
+`POST /api/v3/margin/repay`
+
+Query Body
+
+```json
+{
+  "wallet_type": "CROSS_MARGIN",
+  "type": "LOAN_MANUAL",
+  "currency": "ETH",
+  "amount": 0.02,
+  "pair": "" #must be set for ISOLATED_MARGIN
+}
+```
+
+Response
+
+`200`, `400`, `401`
+
+
+## Margin Interest
+
+### GET
+
+`GET /api/v3/margin/interest`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 32864,
+  "account_id": 25,
+  "wallet_type": "ISOLATED_MARGIN",
+  "date": "2022-10-06T08:28:06.801064-04:00",
+  "currency": "ETH",
+  "pair": "ETH_BTC", #empty for CROSS_MARGIN
+  "interest_rate": 0.00023,
+  "borrow_id": 234,
+  "interest_accrued": 0.0023,
+  "interest_paid": 0.0046
+}...]
+```
+`400`,
+`401`
+
+
+
+## Margin Liquidation
+
+### GET
+
+`GET /api/v3/margin/liquidation`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| open_only  | bool    | if set and true returns open order only                     |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 293878,
+  "account_id": 25,
+  "created_at": "2022-10-06T08:28:06.801064-04:00",
+  "wallet_type": "ISOLATED_MARGIN",
+  "margin_level": 0.002,
+  "closed_at": "",
+  "amount": 0.015,
+  "fund_amount": 0.03,
+  "currency": "ETH",
+  "order_closed": [1, 3],
+  "order_created": [5],
+  "borrow_closed": [22, 41],
+  "repay_created": [54]
+}...]
+```
+`400`,
+`401`
+
+
+## Wallet Addresses
+
+### POST
+
+`POST /api/v3/wallets/addresses`
+
+> Comming soon
+
+## Wallet Withdraw
+
+### POST
+
+`POST /api/v3/wallets/withdraw`
+
+> Comming soon
