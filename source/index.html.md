@@ -1,6 +1,9 @@
 ---
 title: ALP.COM API Reference
 
+language_tabs:
+  - python: Python
+
 toc_footers:
   - <a href='https://alp.com/en/register/'>Sign Up for a Developer Key</a>
   - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
@@ -20,6 +23,24 @@ Service ALP.COM provides open API for trading operations and broadcasting of all
 HTTP API endpoint available on [https://alp.com/api/v3/](https://alp.com/api/v3/).
 
 For users currently using API v1, we strongly recommend transitioning to API v3, as API v1 will soon be deprecated and no longer available.
+
+Available clients:
+ - Python: [https://pypi.org/project/alpcom-api/](https://pypi.org/project/alpcom-api/)
+
+```python
+# pip3 install alpcom-api
+
+from alpcom_api import factories, cache
+
+public_api = factories.get_public_api()
+private_api = factories.get_private_api(
+    key='** Your private_api Key **',
+    secret='** Your private_api Secret **',
+    # Optionally use cache to store temp token
+    # otherwise it will be generated every time an instance of HTTPClient gets created
+    # cache=cache.FileCache('/path/to/token.txt') 
+)
+```
 
 # Constants
 
@@ -311,7 +332,7 @@ Parameter | Type    | Description
 --------- |---------| -----------
 include_subaccounts | bool | if set true, all subaccounts for account are returned as well
 
-Response
+> Response
 
 ```json
 [{
@@ -330,7 +351,7 @@ where:
 
 `GET /api/v3/accounts/balances`
 
-Response
+> Response
 
 ```json
 [{
@@ -351,7 +372,7 @@ where:
 
 `GET /api/v3/accounts/feeinfo`
 
-Response
+> Response
 
 ```json
 [{
@@ -385,7 +406,7 @@ Query Parameters
 >
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 
-Response
+> Response
 
 ```json
 [{
@@ -428,7 +449,7 @@ end_time | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`
 >
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 
-Response
+> Response
 
 ```json
 [{
@@ -466,7 +487,7 @@ Query Parameters
 >
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 
-Response
+> Response
 
 ```json
 [{
@@ -497,7 +518,7 @@ Query Parameters
 |-----------|---------|----------------------------------------|
 | currency  | string  | currency symbol like `BTC` (required!) |
 
-Response
+> Response
 
 ```json
 [{
@@ -532,7 +553,7 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
 | end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
 
-Response
+> Response
 
 ```json
 [{
@@ -556,7 +577,7 @@ Query Parameters
 | currency  | string  | currency symbol like `BTC` (required!) |
 
 
-Response
+> Response
 
 ```json
 [{
@@ -592,7 +613,7 @@ Response
 
 `POST /api/v3/withdraw`
 
-Query Body
+> Query Body
 
 ```json
 {
@@ -623,7 +644,7 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
 | end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
 
-Response
+> Response
 
 ```json
 [{
@@ -649,9 +670,8 @@ Response
 `POST /api/v3/trading/order`
 
 
-Query Body
+> Limit Order Request
 
-Limit Order
 ```json
 {
     "pair": "BTC/USD",
@@ -668,7 +688,7 @@ Limit Order
 }
 ```
 
-Market Order
+> Market Order Request
 ```json
 {
     "pair": "BTC/USD",
@@ -684,7 +704,7 @@ Market Order
 }
 ```
 
-Stop Limit Order
+> Stop Limit Order Request
 ```json
 {
     "pair": "BTC/USD",
@@ -703,19 +723,17 @@ Stop Limit Order
 }
 ```
 
-Response
-
-```
+> Response, (Array of created order ids)
+```json
 [34]
 ```
-Array of order ids
 
 
 ## Cancel Order
 
 `DELETE /api/v3/trading/order`
 
-Query Body
+> Query Body
 
 ```json
 {
@@ -728,19 +746,12 @@ Query Body
 >
 > rather `order_ids` or `all`=`true` must be specified. If `all`=`true`, `pair` can be specified to cancel all orders for one specific pair
 
-Response
-
-`202`,
-`204` (no orders to cancels by specified params),
-`400`, `401`
-
 
 ## Margin Transfer
 
 `POST /api/v3/margin/transfer`
 
-Query Body
-
+> Query Body
 ```json
 {
     "account_id": 12345,
@@ -753,8 +764,10 @@ Query Body
 }
 ```
 
-Response:
-integer - transfer id
+> Response:
+```text
+123 # transfer id
+```
 
 > **Note**
 >
@@ -765,7 +778,7 @@ integer - transfer id
 
 `POST /api/v3/margin/borrow`
 
-Query Body
+> Query Body
 
 ```json
 {
@@ -778,8 +791,10 @@ Query Body
 }
 ```
 
-Response:
-integer - borrow id
+> Response:
+```text
+123 # borrow id
+```
 
 > **Note**
 >
@@ -790,7 +805,7 @@ integer - borrow id
 
 `POST /api/v3/margin/repay`
 
-Query Body
+> Query Body
 
 ```json
 {
@@ -803,8 +818,10 @@ Query Body
 }
 ```
 
-Response:
-integer - repay id
+> Response:
+```text
+123 # repay id
+```
 
 > **Note**
 >
@@ -815,7 +832,7 @@ integer - repay id
 
 `DELETE /api/v3/margin`
 
-Query Body
+> Query Body
 
 ```json
 {
@@ -829,9 +846,6 @@ Query Body
 > rather `ISOLATED_MARGIN` or `CROSS_MARGIN` must be set to `wallet_type`
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
-
-`202`, `400`, `401`
 
 
 ## Margin Loans
@@ -850,7 +864,7 @@ Query Parameters
 > rather `isolated_margin` or `cross_margin` must be set true
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
+> Response
 
 ```json
 [{
@@ -884,9 +898,8 @@ Query Parameters
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
+> Response
 
-`200` -
 ```json
 [{
     "id": 123,
@@ -900,8 +913,6 @@ Response
     "pair": "BTC/USD"
 }, ...]
 ```
-`400`,
-`401`
 
 
 ## Margin Borrow History
@@ -923,9 +934,8 @@ Query Parameters
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
+> Response
 
-`200` -
 ```json
 [{
     "id": 123,
@@ -942,8 +952,6 @@ Response
     "wallet_type": "SPOT"
 }, ...]
 ```
-`400`,
-`401`
 
 
 
@@ -965,9 +973,8 @@ Query Parameters
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
+> Response
 
-`200` -
 ```json
 [{
     "id": 123,
@@ -981,8 +988,6 @@ Response
 }
 ...]
 ```
-`400`,
-`401`
 
 
 ## Margin Interest History
@@ -1003,9 +1008,8 @@ Query Parameters
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
+> Response
 
-`200` -
 ```json
 [{
     "id": 123,
@@ -1018,8 +1022,6 @@ Response
     "wallet_type": "SPOT"
 }, ...]
 ```
-`400`,
-`401`
 
 
 
@@ -1042,9 +1044,8 @@ Query Parameters
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-Response
+> Response
 
-`200` -
 ```json
 [{
   "id": 293878,
@@ -1062,6 +1063,4 @@ Response
   "repay_created": [54]
 }...]
 ```
-`400`,
-`401`
 
