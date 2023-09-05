@@ -94,7 +94,7 @@
       <script src="javascripts/all-0f78e067.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;python&quot;,&quot;javascript&quot;]">
+  <body class="index" data-languages="[]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -103,10 +103,6 @@
     </a>
     <div class="tocify-wrapper">
       <img src="images/logo-5d9a0f3f.png" alt="" />
-        <div class="lang-selector">
-              <a href="#" data-language-name="python">Python</a>
-              <a href="#" data-language-name="javascript">Node.js</a>
-        </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
         </div>
@@ -122,889 +118,1300 @@
       <div class="dark-box"></div>
       <div class="content">
         <h1 id='introduction'>Introduction</h1>
-<p>Welcome to ALP.COM API docs!</p>
+<p>Welcome to ALP.COM API v3 docs!</p>
 
 <p>Service ALP.COM provides open API for trading operations and broadcasting of all trading events.</p>
-<h1 id='http-api-v1'>HTTP API (v1)</h1>
-<p>HTTP API endpoint available on <a href="https://alp.com/api/v1/">https://alp.com/api/v1/</a>.</p>
 
-<p>Some methods requires authorization <a href="#authorization">read below</a>.</p>
+<p>HTTP API endpoint available on <a href="https://alp.com/api/v3/">https://alp.com/api/v3/</a>.</p>
 
-<aside class="success">
-We have limit in 2 calls per second from single account to authorization required methods and 100 calls per secong from single IP address to public methods.
-</aside>
-
-<p>All HTTP methods accept <code>JSON</code> formats of requests and responses if it not specified by headers.</p>
-<h2 id='authorization'>Authorization</h2>
-<blockquote>
-<p>To generate auth headers, use this code:</p>
-</blockquote>
-<div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">hmac</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
-
-<span class="k">def</span> <span class="nf">get_auth_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s">'your key'</span> <span class="o">+</span> <span class="n">urlencode</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-
-        <span class="n">sign</span> <span class="o">=</span> <span class="n">hmac</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="s">'your keys secret'</span><span class="p">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">msg</span><span class="p">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">digestmod</span><span class="o">=</span><span class="s">'sha256'</span><span class="p">).</span><span class="n">hexdigest</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s">'X-KEY'</span><span class="p">:</span> <span class="s">'your key'</span><span class="p">,</span>
-            <span class="s">'X-SIGN'</span><span class="p">:</span> <span class="n">sign</span><span class="p">,</span>
-            <span class="s">'X-NONCE'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)),</span>
-        <span class="p">}</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">const</span> <span class="nx">hmacSha256</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">crypto-js/hmac-sha256</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// sha256 hash. or use you favorite u like</span>
-<span class="kd">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// for http requests. or use you favorite u like</span>
-
-<span class="kd">const</span> <span class="nx">BASE_URL</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">https://alp.com/api/v1</span><span class="dl">'</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">API_KEY</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">0000-0000...</span><span class="dl">'</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">SECRET</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Z%2........</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="c1">//Serialize for singing only. Can be used in request body if u like urlencoded form format instead of json</span>
-<span class="kd">function</span> <span class="nx">serializePayload</span><span class="p">(</span><span class="nx">payload</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nb">Object</span>
-    <span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">payload</span><span class="p">)</span> <span class="c1">// get keys of payload object</span>
-    <span class="p">.</span><span class="nx">sort</span><span class="p">()</span> <span class="c1">// sort keys</span>
-    <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">key</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">=</span><span class="dl">"</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">payload</span><span class="p">[</span><span class="nx">key</span><span class="p">]))</span> <span class="c1">// each value should be url encoded. the most sensitive part for sign checking</span>
-    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">&amp;</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// to sting, separate with ampersand</span>
-<span class="p">}</span>
-
-<span class="c1">// Generates auth headers</span>
-<span class="kd">function</span> <span class="nx">getAuthHeaders</span><span class="p">(</span><span class="nx">payload</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// get SHA256 of &lt;API_KEY&gt;&lt;sorted urlencoded payload string&gt;&lt;SECRET&gt;</span>
-  <span class="kd">const</span> <span class="nx">sign</span> <span class="o">=</span> <span class="nx">hmacSha256</span><span class="p">(</span><span class="nx">API_KEY</span> <span class="o">+</span> <span class="nx">serializePayload</span><span class="p">(</span><span class="nx">payload</span><span class="p">),</span> <span class="nx">SECRET</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
-
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="dl">'</span><span class="s1">X-KEY</span><span class="dl">'</span><span class="p">:</span> <span class="nx">API_KEY</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">X-SIGN</span><span class="dl">'</span><span class="p">:</span> <span class="nx">sign</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">X-NONCE</span><span class="dl">'</span><span class="p">:</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span>
-  <span class="p">};</span>
-<span class="p">}</span>
-
-<span class="kd">function</span> <span class="nx">getWallets</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">payload</span> <span class="o">=</span> <span class="p">{};</span>
-
-  <span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">get</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">url</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">BASE_URL</span><span class="p">}</span><span class="s2">/wallets/`</span><span class="p">,</span>
-    <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">(</span><span class="nx">payload</span><span class="p">)</span>
-  <span class="p">};</span>
-
-  <span class="nx">request</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kd">function</span> <span class="nx">createOrder</span><span class="p">(</span><span class="nx">order</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">post</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">url</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">BASE_URL</span><span class="p">}</span><span class="s2">/order/`</span><span class="p">,</span>
-    <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">(</span><span class="nx">order</span><span class="p">),</span>
-    <span class="na">form</span><span class="p">:</span> <span class="nx">order</span><span class="p">,</span> <span class="c1">// API accepts urlencoded form or json. Use appropriate headers!</span>
-  <span class="p">};</span>
-
-  <span class="nx">request</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="c1">// test</span>
-<span class="nx">getWallets</span><span class="p">((</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">,</span> <span class="nx">body</span><span class="p">);</span>
-<span class="p">});</span>
-
-<span class="kd">const</span> <span class="nx">order</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">buy</span><span class="dl">'</span><span class="p">,</span>
-  <span class="na">pair</span><span class="p">:</span> <span class="dl">'</span><span class="s1">BTC_USD</span><span class="dl">'</span><span class="p">,</span>
-  <span class="na">amount</span><span class="p">:</span> <span class="dl">'</span><span class="s1">0.0001</span><span class="dl">'</span><span class="p">,</span>
-  <span class="na">price</span><span class="p">:</span> <span class="dl">'</span><span class="s1">0.1</span><span class="dl">'</span>
-<span class="p">};</span>
-
-<span class="nx">createOrder</span><span class="p">(</span><span class="nx">order</span><span class="p">,</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="c1">// get json, etc</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">,</span> <span class="nx">body</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></div>
-<p>In order for access to private API methods, generate authorization keys <a href="https://alp.com/en/profile/api">in profile settings</a>.</p>
-
-<p>All request to these methods must contain the following headers:</p>
-
+<p>For users currently using API v1, we strongly recommend transitioning to API v3, as API v1 will soon be deprecated and no longer available.</p>
+<h1 id='constants'>Constants</h1><h3 id='wallet-types'>Wallet Types</h3>
 <ul>
-<li>X-KEY - your key.</li>
-<li>X-SIGN - query&#39;s POST data, sorted by keys and signed by your key&#39;s &quot;secret&quot; according to the HMAC-SHA256 method.</li>
-<li>X-NONCE - integer value, must be greater then nonce in previous api call.</li>
+<li><code>SPOT</code>: Spot Wallet</li>
+<li><code>MARGIN_CROSS</code>: Cross Margin Wallet</li>
+<li><code>MARGIN_ISOLATED</code>: Isolated Margin Wallet</li>
+<li><code>FUNDING</code>: Funding Wallet</li>
 </ul>
-<h1 id='currencies'>Currencies</h1><h2 id='list-all-currencies'>List all currencies</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<h3 id='order-sides'>Order Sides</h3>
+<ul>
+<li><code>BUY</code>: Buy Order</li>
+<li><code>SELL</code>: Sell Order</li>
+</ul>
+<h3 id='order-types'>Order Types</h3>
+<ul>
+<li><code>MARKET</code>: Market Order</li>
+<li><code>LIMIT</code>: Limit Order</li>
+<li><code>STOP_LIMIT</code>: Stop-Limit Order</li>
+<li><code>STOP_MARKET</code>: Stop-Market Order</li>
+</ul>
+<h3 id='order-status'>Order Status</h3>
+<ul>
+<li><code>UNDEFINED</code>: Undefined Order Status</li>
+<li><code>PENDING</code>: Pending Order</li>
+<li><code>OPEN</code>: Open Order</li>
+<li><code>CANCELLED</code>: Cancelled Order</li>
+<li><code>PARTIAL_CANCELLED</code>: Partially Cancelled Order</li>
+<li><code>PARTIAL_FILLED</code>: Partially Filled Order</li>
+<li><code>FILLED</code>: Filled Order</li>
+<li><code>EXPIRED</code>: Expired Order</li>
+<li><code>FAILED</code>: Failed Order</li>
+</ul>
+<h3 id='time-in-force'>Time in Force</h3>
+<ul>
+<li><code>GOOD_TILL_CANCEL</code>: Good &#39;til Cancelled</li>
+<li><code>IMMEDIATE_OR_CANCEL</code>: Immediate or Cancel</li>
+<li><code>ALL_OR_NONE</code>: All or None</li>
+<li><code>FILL_OR_KILL</code>: Fill or Kill</li>
+<li><code>UNDEFINED_TIME_IN_FORCE</code>: Undefined Time in Force</li>
+</ul>
+<h3 id='side-effects'>Side Effects</h3>
+<ul>
+<li><code>NO_SIDE_EFFECT</code>: No Side Effect</li>
+<li><code>AUTO_BORROW</code>: Auto Borrow</li>
+<li><code>AUTO_REPLAY</code>: Auto Replay</li>
+</ul>
+<h3 id='stop-operators'>Stop Operators</h3>
+<ul>
+<li><code>GTE</code>: Greater Than or Equal To</li>
+<li><code>LTE</code>: Less Than or Equal To</li>
+</ul>
+<h3 id='loan-types'>Loan Types</h3>
+<ul>
+<li><code>AUTO</code>: Auto Loan Type</li>
+<li><code>MANUAL</code>: Manual Loan Type</li>
+</ul>
+<h3 id='margin-directions'>Margin Directions</h3>
+<ul>
+<li><code>ADD</code>: Add to Margin</li>
+<li><code>SUB</code>: Subtract from Margin</li>
+</ul>
+<h3 id='deposit-status'>Deposit Status</h3>
+<ul>
+<li><code>PENDING</code>: Pending Deposit</li>
+<li><code>MODERATION</code>: In Moderation</li>
+<li><code>CONFIRMED</code>: Confirmed Deposit</li>
+<li><code>REJECTED</code>: Rejected Deposit</li>
+</ul>
+<h3 id='withdrawal-status'>Withdrawal Status</h3>
+<ul>
+<li><code>NEW</code>: New Withdrawal</li>
+<li><code>CONFIRMED</code>: Confirmed Withdrawal</li>
+<li><code>VERIFIED</code>: Verified Withdrawal</li>
+<li><code>MODERATION</code>: Withdrawal in Moderation</li>
+<li><code>APPROVED</code>: Approved Withdrawal</li>
+<li><code>SUSPENDED</code>: Suspended Withdrawal</li>
+<li><code>DONE</code>: Completed Withdrawal</li>
+<li><code>REFUSED</code>: Refused Withdrawal</li>
+<li><code>CANCELED</code>: Cancelled Withdrawal</li>
+</ul>
+<h3 id='chart-intervals'>Chart Intervals</h3>
+<ul>
+<li><code>FIVE_MIN</code>: 5 minutes</li>
+<li><code>FIFTEEN_MINS</code>: 15 minutes</li>
+<li><code>HALF_HOUR</code>: 30 minutes</li>
+<li><code>HOUR</code>: 1 hour</li>
+<li><code>FOUR_HOURS</code>: 4 hours</li>
+<li><code>DAY</code>: 1 day</li>
+</ul>
+<h1 id='public-api'><em>Public API</em></h1><h2 id='currencies'>Currencies</h2>
+<p><code>GET /api/v3/currencies</code></p>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/currencies/'</span><span class="p">)</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://alp.com/api/v1/currencies/</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// process response</span>
-<span class="p">});</span>
-</code></pre></div>
 <blockquote>
-<p>Sample output</p>
+<p>Response</p>
 </blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
   </span><span class="p">{</span><span class="w">
     </span><span class="nl">"sign"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ƀ"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"short_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"sign"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ξ"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"short_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH"</span><span class="w">
-  </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="w">
 </span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<p>Returns information about all available currencies.</p>
-<h3 id='http-request'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/currencies/</code></p>
-<h1 id='pairs'>Pairs</h1><h2 id='list-all-pairs'>List all pairs</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+</span></code></pre></div><h2 id='pairs'>Pairs</h2>
+<p><code>GET /api/v3/pairs</code></p>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/pairs/'</span><span class="p">)</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
+<p>Query Parameters</p>
 
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://alp.com/api/v1/pairs/</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// process response</span>
-<span class="p">});</span>
-</code></pre></div>
-<blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC_USD"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"currency1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"currency2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"price_precision"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"amount_precision"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"maximum_order_size"</span><span class="p">:</span><span class="w"> </span><span class="mf">100000000.00000000</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"minimum_order_size"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00000001</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"liquidity_type"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-   </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<p>Returns information about all available pairs.</p>
-<h3 id='http-request-2'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/pairs/</code></p>
-<h3 id='query-parameters'>Query Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>currency1</td>
-<td>all</td>
-<td>Filter by first currency.</td>
+<td>string</td>
+<td>filter by base currency</td>
 </tr>
 <tr>
 <td>currency2</td>
-<td>all</td>
-<td>Filter by second currency.</td>
+<td>integer</td>
+<td>filter by quote currency</td>
 </tr>
 </tbody></table>
-<h1 id='tickers'>Tickers</h1><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/ticker/'</span><span class="p">)</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://alp.com/api/v1/ticker/</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// process response</span>
-<span class="p">});</span>
-</code></pre></div>
 <blockquote>
-<p>Sample output</p>
+<p>Response</p>
 </blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">1642511387.55049</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH_BTC"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"last"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.076</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"diff"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"vol"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"high"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"low"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"buy"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.071346</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"sell"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.080317</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<p>Used to fetch last price changes.</p>
-<h3 id='http-request-3'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/ticker/</code></p>
-<h3 id='query-parameters-2'>Query Parameters</h3>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount_precision"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"price_precision"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"maximum_order_size"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"minimum_order_size"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.001</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"minimum_order_value"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='tickers'>Tickers</h2>
+<p><code>GET /api/v3/ticker</code></p>
+
+<p>Query Parameters</p>
+
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>pair</td>
-<td>all</td>
-<td>Filter by pair symbol(e.g. BTC_USD)</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
+</tr>
+<tr>
+<td>pair_id</td>
+<td>integer</td>
+<td>id of pair</td>
 </tr>
 </tbody></table>
-<h1 id='charts'>Charts</h1><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">'limit'</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="p">}</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/charts/BTC_USD/60/chart'</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span><span class="na">limit</span><span class="p">:</span> <span class="mi">1</span><span class="p">};</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span>
-                <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://alp.com/api/charts/BTC_USD/60/chart</span><span class="dl">'</span><span class="p">,</span>
-                <span class="na">qs</span><span class="p">:</span> <span class="nx">params</span>
-            <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// process response</span>
-            <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div>
 <blockquote>
-<p>Sample output</p>
+<p>Response</p>
 </blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"volume"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.262929</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"high"</span><span class="p">:</span><span class="w"> </span><span class="mf">912.236</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"low"</span><span class="p">:</span><span class="w"> </span><span class="mf">910.086</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"close"</span><span class="p">:</span><span class="w"> </span><span class="mf">911.915</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"time"</span><span class="p">:</span><span class="w"> </span><span class="mi">1485777600</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"open"</span><span class="p">:</span><span class="w"> </span><span class="mf">910.424</span><span class="w">
-   </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div><h3 id='timeframes'>Timeframes</h3>
-<table><thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>5</td>
-<td>5 minutes</td>
-</tr>
-<tr>
-<td>15</td>
-<td>15 minutes</td>
-</tr>
-<tr>
-<td>30</td>
-<td>30 minutes</td>
-</tr>
-<tr>
-<td>60</td>
-<td>1 hour</td>
-</tr>
-<tr>
-<td>240</td>
-<td>4 hours</td>
-</tr>
-<tr>
-<td>D</td>
-<td>1 day</td>
-</tr>
-</tbody></table>
-<h3 id='http-request-4'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/charts/&lt;pair_symbol&gt;/&lt;timeframe&gt;/chart</code></p>
-<h3 id='query-parameters-3'>Query Parameters</h3>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"vol"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"buy"</span><span class="p">:</span><span class="w"> </span><span class="mf">44990.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"sell"</span><span class="p">:</span><span class="w"> </span><span class="mf">45010.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"high"</span><span class="p">:</span><span class="w"> </span><span class="mf">45500.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"low"</span><span class="p">:</span><span class="w"> </span><span class="mf">44500.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"diff"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">1630862400.0</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='orderbook'>Orderbook</h2>
+<p><code>GET /api/v3/order_book</code></p>
+
+<p>Query Parameters</p>
+
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>limit</td>
-<td>720</td>
-<td>Limiting results</td>
-</tr>
-<tr>
-<td>since</td>
-<td>-</td>
-<td>Since Timestamp</td>
-</tr>
-<tr>
-<td>until</td>
-<td>-</td>
-<td>Until Timestamp</td>
-</tr>
-</tbody></table>
-<h1 id='wallets'>Wallets</h1><h2 id='list-own-wallets'>List own wallets</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/wallets/'</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">get_auth_headers</span><span class="p">({}))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span>
-    <span class="dl">'</span><span class="s1">https://alp.com/api/v1/wallets/</span><span class="dl">'</span><span class="p">,</span>
-    <span class="p">{</span>
-        <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">({})</span>
-    <span class="p">},</span>
-    <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// process response</span>
-    <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div>
-<blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"balance"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00000000</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"reserve"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00000000</span><span class="w">
-   </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<p>Returns information about all wallets of account.</p>
-<h3 id='http-request-5'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/wallets/</code></p>
-<h3 id='query-parameters-4'>Query Parameters</h3>
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>currency_id</td>
-<td>all</td>
-<td>Filter by currency.</td>
-</tr>
-</tbody></table>
-
-<aside class="warning">
-This method requires authorization.
-</aside>
-<h1 id='orders'>Orders</h1><h2 id='order-statuses'>Order statuses</h2>
-<table><thead>
-<tr>
-<th>Value</th>
-<th>Status name</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>1</td>
-<td>Active</td>
-<td>Order in queue for executing</td>
-</tr>
-<tr>
-<td>2</td>
-<td>Canceled</td>
-<td>Order not active, permanently</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Done</td>
-<td>Order fully executed</td>
-</tr>
-</tbody></table>
-<h2 id='get-orderbook'>Get orderbook</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">limit_bids</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">limit_asks</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/orderbook/BTC_USD'</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">https://alp.com/api/v1/orderbook/BTC_USD</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">limit_bids</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="na">limit_asks</span><span class="p">:</span> <span class="mi">1</span>
-<span class="p">};</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="nx">url</span><span class="p">,</span> <span class="na">qs</span><span class="p">:</span> <span class="nx">params</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// process response</span>
-    <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div>
-<blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"sell"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-    </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">911.519</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.000446</span><span class="w">
-     </span><span class="p">}</span><span class="w">
-   </span><span class="p">],</span><span class="w">
-  </span><span class="nl">"buy"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-    </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">911.122</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.001233</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">]</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<p>Get full orderbook of <strong>active</strong> orders</p>
-<h3 id='http-request-6'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/orderbook/&lt;pair_name&gt;</code></p>
-<h3 id='query-parameters-5'>Query Parameters</h3>
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>limit_sell</td>
-<td>all</td>
-<td>Sell orders limit</td>
-</tr>
-<tr>
-<td>limit_buy</td>
-<td>all</td>
-<td>Buy orders limit</td>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
 </tr>
 <tr>
 <td>group</td>
-<td>0</td>
-<td>If set 1, then order will grouped by price</td>
+<td>integer</td>
+<td>if set <code>1</code> - orders will be grouped by price</td>
+</tr>
+<tr>
+<td>limit_buy</td>
+<td>integer</td>
+<td>limit of buy orders</td>
+</tr>
+<tr>
+<td>limit_sell</td>
+<td>integer</td>
+<td>limit of sell orders</td>
 </tr>
 </tbody></table>
-<h2 id='list-own-orders'>List own orders</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/orders/own/'</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">get_auth_headers</span><span class="p">({}))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://alp.com/api/v1/orders/own/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span><span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">({})},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// process response</span>
-<span class="p">});</span>
-</code></pre></div>
 <blockquote>
-<p>Sample output</p>
+<p>Response</p>
 </blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.500000000</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH_USD"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"buy"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00113000</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">11249</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<aside class="warning">
-This method requires authorization.
-</aside>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"buy"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">44990.0</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"sell"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45010.0</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45020.0</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='charts'>Charts</h2>
+<p><code>GET /api/v3/charts</code></p>
 
-<p>List all orders created in your account. Can be filtered by query parameters.</p>
-<h3 id='http-request-7'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/orders/own/</code></p>
-<h3 id='query-parameters-6'>Query Parameters</h3>
+<p>Query Parameters</p>
+
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>type</td>
-<td>all</td>
-<td>Filter by orders type (sell or buy).</td>
-</tr>
-<tr>
 <td>pair</td>
-<td>none</td>
-<td>Filter by pair.</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code>, <strong>required</strong></td>
 </tr>
 <tr>
-<td>status</td>
-<td>all</td>
-<td>Filter by status.</td>
+<td>interval</td>
+<td>string</td>
+<td>time interval, <strong>required</strong></td>
+</tr>
+<tr>
+<td>since</td>
+<td>integer</td>
+<td>timestamp, filter from</td>
+</tr>
+<tr>
+<td>until</td>
+<td>integer</td>
+<td>timestamp, filter to</td>
 </tr>
 <tr>
 <td>limit</td>
-<td>2000</td>
-<td>Limiting results.</td>
+<td>integer</td>
+<td>timestamp, limit of candles</td>
 </tr>
 </tbody></table>
-<h2 id='retrieve-single-order'>Retrieve single order</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="n">oid</span> <span class="o">=</span> <span class="mi">53189</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/order/{}/'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">oid</span><span class="p">))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">var</span> <span class="nx">oid</span> <span class="o">=</span> <span class="mi">53189</span><span class="p">;</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://alp.com/api/v1/order/</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">oid</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// process response</span>
-<span class="p">});</span>
-</code></pre></div>
 <blockquote>
-<p>Sample output</p>
+<p>Response</p>
 </blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">11259</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="mi">1478025717394</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC_USD"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"buy"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">870.69000000</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1250000</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"amount_filled"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.00419580"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"amount_original"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0041958</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<p>Get detailed information about order by its id</p>
-<h3 id='http-request-8'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/order/&lt;pk&gt;/</code></p>
-<h2 id='create-order'>Create order</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"open"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"close"</span><span class="p">:</span><span class="w"> </span><span class="mf">45100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"high"</span><span class="p">:</span><span class="w"> </span><span class="mf">45200.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"low"</span><span class="p">:</span><span class="w"> </span><span class="mf">44900.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"volume"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"time"</span><span class="p">:</span><span class="w"> </span><span class="mf">1630862400.0</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='trades'>Trades</h2>
+<p><code>GET /api/v3/trades</code></p>
 
-<span class="n">order</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">type</span><span class="p">:</span> <span class="s">'buy'</span><span class="p">,</span>
-    <span class="n">pair</span><span class="p">:</span> <span class="s">'BTC_USD'</span><span class="p">,</span>
-    <span class="n">amount</span><span class="p">:</span> <span class="s">'1.0'</span><span class="p">,</span>
-    <span class="n">price</span><span class="p">:</span> <span class="s">'870.69'</span>
-<span class="p">}</span>
+<p>Query Parameters</p>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/order/'</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">order</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">get_auth_headers</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">var</span> <span class="nx">order</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">buy</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">pair</span><span class="p">:</span> <span class="dl">'</span><span class="s1">BTC_USD</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">amount</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.0</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">price</span><span class="p">:</span> <span class="dl">'</span><span class="s1">870.69</span><span class="dl">'</span>
-<span class="p">};</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
-                <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://alp.com/api/v1/order/</span><span class="dl">'</span><span class="p">,</span>
-                <span class="na">form</span><span class="p">:</span> <span class="nx">order</span><span class="p">,</span>
-                <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">(</span><span class="nx">order</span><span class="p">)</span>
-            <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// process response</span>
-                <span class="c1">// save order id, check if it's executed</span>
-            <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div>
-<blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"buy"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="mf">1483721079.51632</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"oid"</span><span class="p">:</span><span class="w"> </span><span class="mi">11268</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">870.69000000</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00000000</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"trades"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-    </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sell"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">870.69000000</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"o_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">11266</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00010000</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"tid"</span><span class="p">:</span><span class="w"> </span><span class="mi">6049</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">]</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<aside class="warning">
-This method requires authorization.
-</aside>
-
-<p>Create new order that will be automatically executed.</p>
-<h3 id='http-request-9'>HTTP Request</h3>
-<p><code>POST https://alp.com/api/v1/order/</code></p>
-<h3 id='post-params'>POST params</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>type</td>
-<td>Type of order (<code>sell</code> or <code>buy</code>).</td>
-</tr>
-<tr>
-<td>pair</td>
-<td>Pair of order</td>
-</tr>
-<tr>
-<td>amount</td>
-<td>Amount of first currency of pair.</td>
-</tr>
-<tr>
-<td>price</td>
-<td>Price of order. This param have limited precision (See <a href="#pairs">pairs</a>).</td>
-</tr>
-</tbody></table>
-<h2 id='cancel-order'>Cancel order</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">order</span><span class="p">:</span> <span class="mi">63568</span>
-<span class="p">}</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/order-cancel/'</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">get_auth_headers</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">order</span><span class="p">:</span> <span class="mi">63568</span>
-<span class="p">};</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
-        <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://alp.com/api/v1/order-cancel/</span><span class="dl">'</span><span class="p">,</span>
-        <span class="na">form</span><span class="p">:</span> <span class="nx">data</span><span class="p">,</span>
-        <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
-    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// process response</span>
-    <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div>
-<blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"order"</span><span class="p">:</span><span class="w"> </span><span class="mi">63568</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<aside class="warning">
-This method requires authorization.
-</aside>
-
-<p>Cancel your <strong>active</strong> order. If order not exists, it&#39;s done or cancelled error message will be returned.</p>
-<h3 id='http-request-10'>HTTP Request</h3>
-<p><code>POST https://alp.com/api/v1/order-cancel/</code></p>
-<h3 id='post-params-2'>POST params</h3>
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>order</td>
-<td>ID of order to cancel</td>
-</tr>
-</tbody></table>
-<h1 id='exchanges'>Exchanges</h1><h2 id='list-all-exchanges'>List all exchanges</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/exchanges/'</span><span class="p">)</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://alp.com/api/v1/exchanges/</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// process response</span>
-<span class="p">});</span>
-</code></pre></div>
-<blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">6030</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">384360</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">839.36000000</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC_USD"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sell"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">1483705817.735508</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.00281167</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div><h3 id='http-request-11'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/exchanges/</code></p>
-<h3 id='query-parameters-7'>Query Parameters</h3>
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>pair</td>
-<td>all</td>
-<td>Filter by pair.</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
 </tr>
 <tr>
 <td>limit</td>
-<td>100</td>
-<td>Limiting results.</td>
+<td>integer</td>
+<td>limit of records</td>
 </tr>
 <tr>
 <td>offset</td>
-<td>0</td>
-<td>Skip number of records.</td>
-</tr>
-<tr>
-<td>ordering</td>
-<td>-id</td>
-<td>Ordering parameter. <code>id</code> - ascending sorting, <code>-id</code> - descending sorting.</td>
+<td>integer</td>
+<td>offset of records</td>
 </tr>
 </tbody></table>
-<h2 id='list-own-exchanges'>List own exchanges</h2>
-<aside class="warning">
-This method requires authorization.
-</aside>
 
-<p>List only own exchanges where your account was buyer or seller.</p>
-<h3 id='http-request-12'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/exchanges/own/</code></p>
-<h3 id='query-parameters-8'>Query Parameters</h3>
+<blockquote>
+<p>Response</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">101</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">2.5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">1630862400.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"buy"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h1 id='private-api'><em>Private API</em></h1><h2 id='authorization'>Authorization</h2>
+<p>To access private API, clients must use JWT tokens for authentication. Tokens must be included in the Authorization header as follows: <code>Authorization: Bearer {token}</code></p>
+<h3 id='token-expiration'>Token Expiration</h3>
+<p>Clients should check the key <code>exp</code> in the JWT token payload, which contains a timestamp indicating the token&#39;s expiration time. Tokens are valid until this time.</p>
+<h3 id='obtaining-jwt-tokens'>Obtaining JWT Tokens</h3>
+<p>JWT token generates by API Key and API Secret. 
+The API Key pair can be generated in user profile, by link <code>https://alp.com/en/profile/api</code>
+To generate it, make a POST request to the following endpoint: <code>https://alp.com/api/v3/auth</code> with body
+<code>json
+{
+  &quot;api_key&quot;: &quot;&lt;Your API Key&gt;&quot;,
+  &quot;api_secret&quot;: &quot;&lt;Your API Secret&gt;&quot;
+}
+</code></p>
+<h3 id='post-method-signature-x-sign-header'>POST Method Signature (X-SIGN Header)</h3>
+<p>For POST requests, clients must include a request signature in the <code>X-SIGN</code> header. 
+Calculate this signature as the HMAC SHA-256 hash of the request body using the <code>api_secret</code> obtained earlier.</p>
+<h2 id='accounts'>Accounts</h2>
+<p><code>GET /api/v3/accounts/accounts</code></p>
+
+<p>Query Parameters</p>
+
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>type</td>
-<td>all</td>
-<td>Filter by orders type (sell or buy).</td>
+<td>include_subaccounts</td>
+<td>bool</td>
+<td>if set true, all subaccounts for account are returned as well</td>
 </tr>
+</tbody></table>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example@email.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John Doe"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"parent_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}]</span><span class="w">
+</span></code></pre></div>
+<p>where:
+<code>parent_id</code> - for sub accounts it indicates id of master account</p>
+<h2 id='account-balances'>Account Balances</h2>
+<p><code>GET /api/v3/accounts/balances</code></p>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"balance"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"reserve"</span><span class="p">:</span><span class="w"> </span><span class="mf">500.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last_update_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div>
+<p>where:
+<code>reserve</code> - balance in open orders, pending withdraws, etc.</p>
+<h2 id='fee-info'>Fee Info</h2>
+<p><code>GET /api/v3/accounts/feeinfo</code></p>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"active_once"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2023-09-05T12:00:00Z"</span><span class="p">],</span><span class="w">
+    </span><span class="nl">"taker_fee_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"maker_fee_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0015</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"priority"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_active"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='orders'>Orders</h2>
+<p><code>GET /api/v3/accounts/order</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
 <tr>
 <td>pair</td>
-<td>all</td>
-<td>Filter by pair.</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
 </tr>
 <tr>
-<td>limit</td>
-<td>100</td>
-<td>Limiting results.</td>
+<td>open_only</td>
+<td>bool</td>
+<td>if set and true returns open order only</td>
 </tr>
 <tr>
-<td>offset</td>
-<td>0</td>
-<td>Skip number of records.</td>
+<td>side</td>
+<td>string</td>
+<td>if set must be rather <code>BUY</code> or <code>SELL</code></td>
 </tr>
 <tr>
-<td>ordering</td>
-<td>-id</td>
-<td>Ordering parameter. <code>id</code> - ascending sorting, <code>-id</code> - descending sorting.</td>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
 </tr>
 </tbody></table>
-<h1 id='deposits'>Deposits</h1><h2 id='list-own-deposits'>List own deposits</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/deposits/'</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">get_auth_headers</span><span class="p">({}))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span>
-                <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://alp.com/api/v1/deposits/</span><span class="dl">'</span><span class="p">,</span>
-                <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">({})</span>
-            <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// process response</span>
-            <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">1485363039.18359</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">317</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">530.00000000</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<aside class="warning">
-This method requires authorization.
-</aside>
-
-<p>List your deposits</p>
-<h3 id='http-request-13'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/deposits/</code></p>
-<h1 id='withdraws'>Withdraws</h1><h2 id='withdraw-statuses'>Withdraw statuses</h2>
-<table><thead>
-<tr>
-<th>Value</th>
-<th>Status name</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>10</td>
-<td>New</td>
-<td>Withdraw created, verification need</td>
-</tr>
-<tr>
-<td>20</td>
-<td>Verified</td>
-<td>Withdraw verified, waiting for approving</td>
-</tr>
-<tr>
-<td>30</td>
-<td>Approved</td>
-<td>Approved by moderator</td>
-</tr>
-<tr>
-<td>40</td>
-<td>Refused</td>
-<td>Refused by moderator. See your email for more details</td>
-</tr>
-<tr>
-<td>50</td>
-<td>Canceled</td>
-<td>Cancelled by user</td>
-</tr>
-</tbody></table>
-<h2 id='list-own-made-withdraws'>List own made withdraws</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://alp.com/api/v1/withdraws/'</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">get_auth_headers</span><span class="p">({}))</span>
-</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span>
-        <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://alp.com/api/v1/withdraws/</span><span class="dl">'</span><span class="p">,</span>
-        <span class="na">headers</span><span class="p">:</span> <span class="nx">getAuthHeaders</span><span class="p">({})</span>
-    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// process response</span>
-    <span class="p">}</span>
-<span class="p">);</span>
-</code></pre></div>
 <blockquote>
-<p>Sample output</p>
-</blockquote>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">403</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">1485363466.868539</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.53000000</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div>
-<aside class="warning">
-This method requires authorization.
-</aside>
+<p><strong>Note</strong></p>
 
-<p>Get list of your withdraws</p>
-<h3 id='http-request-14'>HTTP Request</h3>
-<p><code>GET https://alp.com/api/v1/withdraws/</code></p>
-<h3 id='query-parameters-9'>Query Parameters</h3>
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.</p>
+</blockquote>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"side"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BID"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FILLED"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LIMIT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount_canceled"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount_filled"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"open_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T11:59:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tif"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GTC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:01:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"done_at"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"expire_after"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"stop_price"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='account-trades'>Account Trades</h2>
+<p><code>GET /api/v3/accounts/trades</code></p>
+
+<p>Query Parameters</p>
+
 <table><thead>
 <tr>
 <th>Parameter</th>
-<th>Default</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>currency_id</td>
-<td>all</td>
-<td>Filter currency.</td>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
 </tr>
 <tr>
-<td>status</td>
-<td>all</td>
-<td>Filter by status.</td>
+<td>side</td>
+<td>string</td>
+<td>if set must be rather <code>BUY</code> or <code>SELL</code></td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
 </tr>
 </tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.</p>
+</blockquote>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount_unfilled"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FILLED"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.005</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.005</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_maker"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LIMIT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='operation-history'>Operation History</h2>
+<p><code>GET /api/v3/accounts/activity</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.</p>
+</blockquote>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">67890</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DEPOSIT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"balance"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"balance_delta"</span><span class="p">:</span><span class="w"> </span><span class="mf">500.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"balance_end"</span><span class="p">:</span><span class="w"> </span><span class="mf">1500.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"reserve"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"reserve_delta"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"reserve_end"</span><span class="p">:</span><span class="w"> </span><span class="mf">150.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="w">
+</span><span class="p">}</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='deposit-methods'>Deposit Methods</h2>
+<p><code>GET /api/v3/deposit/methods</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code> (required!)</td>
+</tr>
+</tbody></table>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"network"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Network"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"address"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1234567890abcdef"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"memo"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"confirmations"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"min_deposit"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"max_deposit"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='deposit-history'>Deposit History</h2>
+<p><code>GET /api/v3/deposit</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PENDING"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tx_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xabc123def456"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='withdraw-methods'>Withdraw Methods</h2>
+<p><code>GET /api/v3/withdraw/methods</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code> (required!)</td>
+</tr>
+</tbody></table>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"network"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"address"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1234567890abcdef"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"memo"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"fee_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"min_withdraw"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"max_withdraw"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div>
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>This method is disabled by default, set &quot;Can Withdraw&quot; during creation of an API-Key to use it.</p>
+</blockquote>
+<h2 id='withdraw-request'>Withdraw Request</h2>
+<p><code>POST /api/v3/withdraw</code></p>
+
+<p>Query Body</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"method"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xabcdef1234567890"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"memo"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"client_order_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"withdraw-1"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>This method is disabled by default, set &quot;Can Withdraw&quot; during creation of an API-Key to use it.</p>
+</blockquote>
+<h2 id='withdraw-history'>Withdraw History</h2>
+<p><code>GET /api/v3/withdraw</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fee_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"COMPLETED"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tx_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xabcdef1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div>
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>This method is disabled by default, set &quot;Can Withdraw&quot; during creation of an API-Key to use it.</p>
+</blockquote>
+<h2 id='place-order'>Place Order</h2>
+<p><code>POST /api/v3/trading/order</code></p>
+
+<p>Query Body</p>
+
+<p>Limit Order
+<code>json
+{
+    &quot;pair&quot;: &quot;BTC/USD&quot;,
+    &quot;order_side&quot;: &quot;BID&quot;,
+    &quot;client_order_id&quot;: &quot;1&quot;,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;,
+    &quot;side_effect&quot;: &quot;NO_SIDE_EFFECT&quot;,
+    &quot;valid_till&quot;: null,
+    &quot;expire_after&quot;: null,
+    &quot;base_amount&quot;: 1.0,
+    &quot;limit_price&quot;: 45000.0,
+    &quot;order_type&quot;: &quot;LIMIT&quot;,
+    &quot;tif&quot;: &quot;GTC&quot;
+}
+</code></p>
+
+<p>Market Order
+<code>json
+{
+    &quot;pair&quot;: &quot;BTC/USD&quot;,
+    &quot;order_side&quot;: &quot;BID&quot;,
+    &quot;client_order_id&quot;: &quot;1&quot;,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;,
+    &quot;side_effect&quot;: &quot;NO_SIDE_EFFECT&quot;,
+    &quot;valid_till&quot;: null,
+    &quot;expire_after&quot;: null,
+    &quot;base_amount&quot;: null,
+    &quot;quote_amount&quot;: null,
+    &quot;order_type&quot;: &quot;MARKET&quot;
+}
+</code></p>
+
+<p>Stop Limit Order
+<code>json
+{
+    &quot;pair&quot;: &quot;BTC/USD&quot;,
+    &quot;order_side&quot;: &quot;BID&quot;,
+    &quot;client_order_id&quot;: &quot;1&quot;,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;,
+    &quot;side_effect&quot;: &quot;NO_SIDE_EFFECT&quot;,
+    &quot;valid_till&quot;: null,
+    &quot;expire_after&quot;: null,
+    &quot;base_amount&quot;: 1.0,
+    &quot;limit_price&quot;: 45000.0,
+    &quot;stop_price&quot;: 44000.0,
+    &quot;stop_operator&quot;: &quot;GTE&quot;,
+    &quot;order_type&quot;: &quot;STOP_LIMIT&quot;,
+    &quot;tif&quot;: &quot;GTC&quot;
+}
+</code></p>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight plaintext"><code>[34]
+</code></pre></div>
+<p>Array of order ids</p>
+<h2 id='cancel-order'>Cancel Order</h2>
+<p><code>DELETE /api/v3/trading/order</code></p>
+
+<p>Query Body</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"order_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">],</span><span class="w">
+  </span><span class="nl">"all"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>rather <code>order_ids</code> or <code>all</code>=<code>true</code> must be specified. If <code>all</code>=<code>true</code>, <code>pair</code> can be specified to cancel all orders for one specific pair</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>202</code>,
+<code>204</code> (no orders to cancels by specified params),
+<code>400</code>, <code>401</code></p>
+<h2 id='margin-transfer'>Margin Transfer</h2>
+<p><code>POST /api/v3/margin/transfer</code></p>
+
+<p>Query Body</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ADD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"note"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Response:
+integer - transfer id</p>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+<h2 id='margin-borrow'>Margin Borrow</h2>
+<p><code>POST /api/v3/margin/borrow</code></p>
+
+<p>Query Body</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"borrow"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LOAN_MANUAL"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Response:
+integer - borrow id</p>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+<h2 id='margin-repay'>Margin Repay</h2>
+<p><code>POST /api/v3/margin/repay</code></p>
+
+<p>Query Body</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LOAN_MANUAL"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Response:
+integer - repay id</p>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+<h3 id='close-position'>Close Position</h3>
+<p><code>DELETE /api/v3/margin</code></p>
+
+<p>Query Body</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC_USDT"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ISOLATED_MARGIN"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>rather <code>ISOLATED_MARGIN</code> or <code>CROSS_MARGIN</code> must be set to <code>wallet_type</code>
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>202</code>, <code>400</code>, <code>401</code></p>
+<h2 id='margin-loans'>Margin Loans</h2>
+<p><code>GET /api/v3/margin</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>isolated_margin</td>
+<td>bool</td>
+<td>if set true isolated margin positions are returned</td>
+</tr>
+<tr>
+<td>cross_margin</td>
+<td>bool</td>
+<td>if set true cross margin positions are returned</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p>rather <code>isolated_margin</code> or <code>cross_margin</code> must be set true
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"borrowed"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='margin-transfer-history'>Margin Transfer History</h2>
+<p><code>GET /api/v3/margin/transfer</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
+</tr>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>open_only</td>
+<td>bool</td>
+<td>if set and true returns open order only</td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>200</code> -
+<code>json
+[{
+    &quot;id&quot;: 123,
+    &quot;account_id&quot;: 456,
+    &quot;amount&quot;: 100.0,
+    &quot;currency&quot;: &quot;USD&quot;,
+    &quot;date&quot;: &quot;2023-09-04T12:00:00Z&quot;,
+    &quot;direction&quot;: &quot;ADD&quot;,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;,
+    &quot;note&quot;: &quot;Transfer from Spot to Margin&quot;,
+    &quot;pair&quot;: &quot;BTC/USD&quot;
+}, ...]
+</code>
+<code>400</code>,
+<code>401</code></p>
+<h2 id='margin-borrow-history'>Margin Borrow History</h2>
+<p><code>GET /api/v3/margin/borrow</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
+</tr>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>open_only</td>
+<td>bool</td>
+<td>if set and true returns open order only</td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>200</code> -
+<code>json
+[{
+    &quot;id&quot;: 123,
+    &quot;account_id&quot;: 456,
+    &quot;borrowed&quot;: 1000.0,
+    &quot;date&quot;: &quot;2023-09-04T12:00:00Z&quot;,
+    &quot;interest_accrued&quot;: 50.0,
+    &quot;interest_paid&quot;: 10.0,
+    &quot;interest_rate&quot;: 0.05,
+    &quot;repaid&quot;: 0.0,
+    &quot;last_interest_at&quot;: null,
+    &quot;opened_at&quot;: &quot;2023-09-04T11:00:00Z&quot;,
+    &quot;type&quot;: &quot;AUTO&quot;,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;
+}, ...]
+</code>
+<code>400</code>,
+<code>401</code></p>
+<h2 id='margin-repay-history'>Margin Repay History</h2>
+<p><code>GET /api/v3/margin/repay</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
+</tr>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>200</code> -
+<code>json
+[{
+    &quot;id&quot;: 123,
+    &quot;account_id&quot;: 456,
+    &quot;interest_amount&quot;: 10.0,
+    &quot;principal_amount&quot;: 100.0,
+    &quot;currency&quot;: &quot;USDT&quot;,
+    &quot;date&quot;: &quot;2023-09-04T12:00:00Z&quot;,
+    &quot;type&quot;: &quot;AUTO&quot;,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;
+}
+...]
+</code>
+<code>400</code>,
+<code>401</code></p>
+<h2 id='margin-interest-history'>Margin Interest History</h2>
+<p><code>GET /api/v3/margin/interest</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
+</tr>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>200</code> -
+<code>json
+[{
+    &quot;id&quot;: 123,
+    &quot;account_id&quot;: 456,
+    &quot;borrow_id&quot;: 789,
+    &quot;currency&quot;: &quot;USDT&quot;,
+    &quot;interest_accrued&quot;: 50.0,
+    &quot;interest_paid&quot;: 10.0,
+    &quot;interest_rate&quot;: 0.05,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;
+}, ...]
+</code>
+<code>400</code>,
+<code>401</code></p>
+<h2 id='margin-liquidation-history'>Margin Liquidation History</h2>
+<p><code>GET /api/v3/margin/liquidation</code></p>
+
+<p>Query Parameters</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>pair</td>
+<td>string</td>
+<td>pair symbol like <code>BTC_USDT</code></td>
+</tr>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>currency symbol like <code>BTC</code></td>
+</tr>
+<tr>
+<td>open_only</td>
+<td>bool</td>
+<td>if set and true returns open order only</td>
+</tr>
+<tr>
+<td>start_time</td>
+<td>string</td>
+<td>start time filter (&gt;=), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+<tr>
+<td>end_time</td>
+<td>string</td>
+<td>start time filter (&lt;), format: <code>2006-01-02T15:04:05Z07:00</code></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>Note</strong></p>
+
+<p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
+</blockquote>
+
+<p>Response</p>
+
+<p><code>200</code> -
+<code>json
+[{
+  &quot;id&quot;: 293878,
+  &quot;account_id&quot;: 25,
+  &quot;created_at&quot;: &quot;2022-10-06T08:28:06.801064-04:00&quot;,
+  &quot;wallet_type&quot;: &quot;ISOLATED_MARGIN&quot;,
+  &quot;margin_level&quot;: 0.002,
+  &quot;closed_at&quot;: &quot;&quot;,
+  &quot;amount&quot;: 0.015,
+  &quot;fund_amount&quot;: 0.03,
+  &quot;currency&quot;: &quot;ETH&quot;,
+  &quot;order_closed&quot;: [1, 3],
+  &quot;order_created&quot;: [5],
+  &quot;borrow_closed&quot;: [22, 41],
+  &quot;repay_created&quot;: [54]
+}...]
+</code>
+<code>400</code>,
+<code>401</code></p>
 
           <h1 id='http-errors'>HTTP Errors</h1>
 <p>HTTP API uses following error statuses:</p>
@@ -1055,10 +1462,6 @@ This method requires authorization.
 
       </div>
       <div class="dark-box">
-          <div class="lang-selector">
-                <a href="#" data-language-name="python">Python</a>
-                <a href="#" data-language-name="javascript">Node.js</a>
-          </div>
       </div>
     </div>
   </body>
