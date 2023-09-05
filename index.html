@@ -94,7 +94,7 @@
       <script src="javascripts/all-0f78e067.js"></script>
   </head>
 
-  <body class="index" data-languages="[]">
+  <body class="index" data-languages="[&quot;python&quot;]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -103,6 +103,9 @@
     </a>
     <div class="tocify-wrapper">
       <img src="images/logo-5d9a0f3f.png" alt="" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="python">Python</a>
+        </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
         </div>
@@ -125,7 +128,22 @@
 <p>HTTP API endpoint available on <a href="https://alp.com/api/v3/">https://alp.com/api/v3/</a>.</p>
 
 <p>For users currently using API v1, we strongly recommend transitioning to API v3, as API v1 will soon be deprecated and no longer available.</p>
-<h1 id='constants'>Constants</h1><h3 id='wallet-types'>Wallet Types</h3>
+
+<p>Available clients:
+ - Python: <a href="https://pypi.org/project/alpcom-api/">https://pypi.org/project/alpcom-api/</a></p>
+<div class="highlight"><pre class="highlight python tab-python"><code><span class="c1"># pip3 install alpcom-api
+</span>
+<span class="kn">from</span> <span class="nn">alpcom_api</span> <span class="kn">import</span> <span class="n">factories</span><span class="p">,</span> <span class="n">cache</span>
+
+<span class="n">public_api</span> <span class="o">=</span> <span class="n">factories</span><span class="p">.</span><span class="n">get_public_api</span><span class="p">()</span>
+<span class="n">private_api</span> <span class="o">=</span> <span class="n">factories</span><span class="p">.</span><span class="n">get_private_api</span><span class="p">(</span>
+    <span class="n">key</span><span class="o">=</span><span class="s">'** Your private_api Key **'</span><span class="p">,</span>
+    <span class="n">secret</span><span class="o">=</span><span class="s">'** Your private_api Secret **'</span><span class="p">,</span>
+    <span class="c1"># Optionally use cache to store temp token
+</span>    <span class="c1"># otherwise it will be generated every time an instance of HTTPClient gets created
+</span>    <span class="c1"># cache=cache.FileCache('/path/to/token.txt') 
+</span><span class="p">)</span>
+</code></pre></div><h1 id='constants'>Constants</h1><h3 id='wallet-types'>Wallet Types</h3>
 <ul>
 <li><code>SPOT</code>: Spot Wallet</li>
 <li><code>MARGIN_CROSS</code>: Cross Margin Wallet</li>
@@ -486,7 +504,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 </tr>
 </tbody></table>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="nl">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example@email.com"</span><span class="p">,</span><span class="w">
@@ -499,7 +519,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <h2 id='account-balances'>Account Balances</h2>
 <p><code>GET /api/v3/accounts/balances</code></p>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"balance"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
     </span><span class="nl">"reserve"</span><span class="p">:</span><span class="w"> </span><span class="mf">500.0</span><span class="p">,</span><span class="w">
@@ -515,7 +537,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <h2 id='fee-info'>Fee Info</h2>
 <p><code>GET /api/v3/accounts/feeinfo</code></p>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
     </span><span class="nl">"active_once"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2023-09-05T12:00:00Z"</span><span class="p">],</span><span class="w">
@@ -570,9 +594,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <p><strong>Note</strong></p>
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.</p>
-</blockquote>
 
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
@@ -631,9 +655,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <p><strong>Note</strong></p>
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.</p>
-</blockquote>
 
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
     </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USD"</span><span class="p">,</span><span class="w">
@@ -683,9 +707,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <p><strong>Note</strong></p>
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.</p>
-</blockquote>
 
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
@@ -720,7 +744,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 </tr>
 </tbody></table>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"network"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Network"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
@@ -768,7 +794,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 </tr>
 </tbody></table>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
@@ -796,7 +824,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 </tr>
 </tbody></table>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="nl">"network"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH"</span><span class="p">,</span><span class="w">
@@ -828,7 +858,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <h2 id='withdraw-request'>Withdraw Request</h2>
 <p><code>POST /api/v3/withdraw</code></p>
 
+<blockquote>
 <p>Query Body</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
     </span><span class="nl">"method"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
@@ -873,7 +905,9 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 </tr>
 </tbody></table>
 
+<blockquote>
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
@@ -894,26 +928,25 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 <h2 id='place-order'>Place Order</h2>
 <p><code>POST /api/v3/trading/order</code></p>
 
-<p>Query Body</p>
-
-<p>Limit Order
-<code>json
-{
-    &quot;pair&quot;: &quot;BTC/USD&quot;,
-    &quot;order_side&quot;: &quot;BID&quot;,
-    &quot;client_order_id&quot;: &quot;1&quot;,
-    &quot;wallet_type&quot;: &quot;SPOT&quot;,
-    &quot;side_effect&quot;: &quot;NO_SIDE_EFFECT&quot;,
-    &quot;valid_till&quot;: null,
-    &quot;expire_after&quot;: null,
-    &quot;base_amount&quot;: 1.0,
-    &quot;limit_price&quot;: 45000.0,
-    &quot;order_type&quot;: &quot;LIMIT&quot;,
-    &quot;tif&quot;: &quot;GTC&quot;
-}
-</code></p>
-
-<p>Market Order
+<blockquote>
+<p>Limit Order Request</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"order_side"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BID"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"client_order_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"side_effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NO_SIDE_EFFECT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"valid_till"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"expire_after"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"base_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"limit_price"</span><span class="p">:</span><span class="w"> </span><span class="mf">45000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"order_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LIMIT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tif"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GTC"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<blockquote>
+<p>Market Order Request
 <code>json
 {
     &quot;pair&quot;: &quot;BTC/USD&quot;,
@@ -929,7 +962,7 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 }
 </code></p>
 
-<p>Stop Limit Order
+<p>Stop Limit Order Request
 <code>json
 {
     &quot;pair&quot;: &quot;BTC/USD&quot;,
@@ -948,14 +981,17 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 }
 </code></p>
 
-<p>Response</p>
-<div class="highlight"><pre class="highlight plaintext"><code>[34]
-</code></pre></div>
-<p>Array of order ids</p>
+<p>Response, (Array of created order ids)
+<code>json
+[34]
+</code></p>
+</blockquote>
 <h2 id='cancel-order'>Cancel Order</h2>
 <p><code>DELETE /api/v3/trading/order</code></p>
 
+<blockquote>
 <p>Query Body</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="nl">"order_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">],</span><span class="w">
   </span><span class="nl">"all"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
@@ -967,30 +1003,28 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 
 <p>rather <code>order_ids</code> or <code>all</code>=<code>true</code> must be specified. If <code>all</code>=<code>true</code>, <code>pair</code> can be specified to cancel all orders for one specific pair</p>
 </blockquote>
-
-<p>Response</p>
-
-<p><code>202</code>,
-<code>204</code> (no orders to cancels by specified params),
-<code>400</code>, <code>401</code></p>
 <h2 id='margin-transfer'>Margin Transfer</h2>
 <p><code>POST /api/v3/margin/transfer</code></p>
 
-<p>Query Body</p>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ADD"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"note"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<p>Response:
-integer - transfer id</p>
-
 <blockquote>
+<p>Query Body
+<code>json
+{
+    &quot;account_id&quot;: 12345,
+    &quot;wallet_type&quot;: &quot;SPOT&quot;,
+    &quot;direction&quot;: &quot;ADD&quot;,
+    &quot;amount&quot;: 100.0,
+    &quot;currency&quot;: &quot;USDT&quot;,
+    &quot;pair&quot;: null,
+    &quot;note&quot;: null
+}
+</code></p>
+
+<p>Response:
+<code>text
+123 # transfer id
+</code></p>
+
 <p><strong>Note</strong></p>
 
 <p>This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
@@ -998,7 +1032,9 @@ integer - transfer id</p>
 <h2 id='margin-borrow'>Margin Borrow</h2>
 <p><code>POST /api/v3/margin/borrow</code></p>
 
+<blockquote>
 <p>Query Body</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
     </span><span class="nl">"borrow"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
@@ -1008,10 +1044,12 @@ integer - transfer id</p>
     </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LOAN_MANUAL"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>Response:
-integer - borrow id</p>
-
 <blockquote>
+<p>Response:
+<code>text
+123 # borrow id
+</code></p>
+
 <p><strong>Note</strong></p>
 
 <p>This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
@@ -1019,7 +1057,9 @@ integer - borrow id</p>
 <h2 id='margin-repay'>Margin Repay</h2>
 <p><code>POST /api/v3/margin/repay</code></p>
 
+<blockquote>
 <p>Query Body</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w">
     </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
@@ -1029,10 +1069,12 @@ integer - borrow id</p>
     </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LOAN_MANUAL"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>Response:
-integer - repay id</p>
-
 <blockquote>
+<p>Response:
+<code>text
+123 # repay id
+</code></p>
+
 <p><strong>Note</strong></p>
 
 <p>This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
@@ -1040,7 +1082,9 @@ integer - repay id</p>
 <h3 id='close-position'>Close Position</h3>
 <p><code>DELETE /api/v3/margin</code></p>
 
+<blockquote>
 <p>Query Body</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC_USDT"</span><span class="p">,</span><span class="w">
   </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ISOLATED_MARGIN"</span><span class="w">
@@ -1052,10 +1096,6 @@ integer - repay id</p>
 <p>rather <code>ISOLATED_MARGIN</code> or <code>CROSS_MARGIN</code> must be set to <code>wallet_type</code>
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
 </blockquote>
-
-<p>Response</p>
-
-<p><code>202</code>, <code>400</code>, <code>401</code></p>
 <h2 id='margin-loans'>Margin Loans</h2>
 <p><code>GET /api/v3/margin</code></p>
 
@@ -1085,9 +1125,9 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
 <p>rather <code>isolated_margin</code> or <code>cross_margin</code> must be set true
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
-</blockquote>
 
 <p>Response</p>
+</blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
     </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
@@ -1140,27 +1180,21 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
-</blockquote>
 
 <p>Response</p>
-
-<p><code>200</code> -
-<code>json
-[{
-    &quot;id&quot;: 123,
-    &quot;account_id&quot;: 456,
-    &quot;amount&quot;: 100.0,
-    &quot;currency&quot;: &quot;USD&quot;,
-    &quot;date&quot;: &quot;2023-09-04T12:00:00Z&quot;,
-    &quot;direction&quot;: &quot;ADD&quot;,
-    &quot;wallet_type&quot;: &quot;SPOT&quot;,
-    &quot;note&quot;: &quot;Transfer from Spot to Margin&quot;,
-    &quot;pair&quot;: &quot;BTC/USD&quot;
-}, ...]
-</code>
-<code>400</code>,
-<code>401</code></p>
-<h2 id='margin-borrow-history'>Margin Borrow History</h2>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ADD"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Transfer from Spot to Margin"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC/USD"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='margin-borrow-history'>Margin Borrow History</h2>
 <p><code>GET /api/v3/margin/borrow</code></p>
 
 <p>Query Parameters</p>
@@ -1204,30 +1238,24 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
-</blockquote>
 
 <p>Response</p>
-
-<p><code>200</code> -
-<code>json
-[{
-    &quot;id&quot;: 123,
-    &quot;account_id&quot;: 456,
-    &quot;borrowed&quot;: 1000.0,
-    &quot;date&quot;: &quot;2023-09-04T12:00:00Z&quot;,
-    &quot;interest_accrued&quot;: 50.0,
-    &quot;interest_paid&quot;: 10.0,
-    &quot;interest_rate&quot;: 0.05,
-    &quot;repaid&quot;: 0.0,
-    &quot;last_interest_at&quot;: null,
-    &quot;opened_at&quot;: &quot;2023-09-04T11:00:00Z&quot;,
-    &quot;type&quot;: &quot;AUTO&quot;,
-    &quot;wallet_type&quot;: &quot;SPOT&quot;
-}, ...]
-</code>
-<code>400</code>,
-<code>401</code></p>
-<h2 id='margin-repay-history'>Margin Repay History</h2>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"borrowed"</span><span class="p">:</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_accrued"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_paid"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"repaid"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last_interest_at"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"opened_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T11:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AUTO"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='margin-repay-history'>Margin Repay History</h2>
 <p><code>GET /api/v3/margin/repay</code></p>
 
 <p>Query Parameters</p>
@@ -1266,27 +1294,21 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
-</blockquote>
 
 <p>Response</p>
-
-<p><code>200</code> -
-<code>json
-[{
-    &quot;id&quot;: 123,
-    &quot;account_id&quot;: 456,
-    &quot;interest_amount&quot;: 10.0,
-    &quot;principal_amount&quot;: 100.0,
-    &quot;currency&quot;: &quot;USDT&quot;,
-    &quot;date&quot;: &quot;2023-09-04T12:00:00Z&quot;,
-    &quot;type&quot;: &quot;AUTO&quot;,
-    &quot;wallet_type&quot;: &quot;SPOT&quot;
-}
-...]
-</code>
-<code>400</code>,
-<code>401</code></p>
-<h2 id='margin-interest-history'>Margin Interest History</h2>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"principal_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-09-04T12:00:00Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AUTO"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='margin-interest-history'>Margin Interest History</h2>
 <p><code>GET /api/v3/margin/interest</code></p>
 
 <p>Query Parameters</p>
@@ -1325,26 +1347,20 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
-</blockquote>
 
 <p>Response</p>
-
-<p><code>200</code> -
-<code>json
-[{
-    &quot;id&quot;: 123,
-    &quot;account_id&quot;: 456,
-    &quot;borrow_id&quot;: 789,
-    &quot;currency&quot;: &quot;USDT&quot;,
-    &quot;interest_accrued&quot;: 50.0,
-    &quot;interest_paid&quot;: 10.0,
-    &quot;interest_rate&quot;: 0.05,
-    &quot;wallet_type&quot;: &quot;SPOT&quot;
-}, ...]
-</code>
-<code>400</code>,
-<code>401</code></p>
-<h2 id='margin-liquidation-history'>Margin Liquidation History</h2>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"borrow_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">789</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_accrued"</span><span class="p">:</span><span class="w"> </span><span class="mf">50.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_paid"</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"interest_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SPOT"</span><span class="w">
+</span><span class="p">},</span><span class="w"> </span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='margin-liquidation-history'>Margin Liquidation History</h2>
 <p><code>GET /api/v3/margin/liquidation</code></p>
 
 <p>Query Parameters</p>
@@ -1388,31 +1404,25 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
-</blockquote>
 
 <p>Response</p>
-
-<p><code>200</code> -
-<code>json
-[{
-  &quot;id&quot;: 293878,
-  &quot;account_id&quot;: 25,
-  &quot;created_at&quot;: &quot;2022-10-06T08:28:06.801064-04:00&quot;,
-  &quot;wallet_type&quot;: &quot;ISOLATED_MARGIN&quot;,
-  &quot;margin_level&quot;: 0.002,
-  &quot;closed_at&quot;: &quot;&quot;,
-  &quot;amount&quot;: 0.015,
-  &quot;fund_amount&quot;: 0.03,
-  &quot;currency&quot;: &quot;ETH&quot;,
-  &quot;order_closed&quot;: [1, 3],
-  &quot;order_created&quot;: [5],
-  &quot;borrow_closed&quot;: [22, 41],
-  &quot;repay_created&quot;: [54]
-}...]
-</code>
-<code>400</code>,
-<code>401</code></p>
-
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">293878</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2022-10-06T08:28:06.801064-04:00"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"wallet_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ISOLATED_MARGIN"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"margin_level"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"closed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.015</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"fund_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.03</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"order_closed"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">],</span><span class="w">
+  </span><span class="nl">"order_created"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="w">
+  </span><span class="nl">"borrow_closed"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="mi">41</span><span class="p">],</span><span class="w">
+  </span><span class="nl">"repay_created"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">54</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div>
           <h1 id='http-errors'>HTTP Errors</h1>
 <p>HTTP API uses following error statuses:</p>
 
@@ -1462,6 +1472,9 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 
       </div>
       <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="python">Python</a>
+          </div>
       </div>
     </div>
   </body>
