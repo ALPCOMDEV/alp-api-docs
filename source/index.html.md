@@ -1,10 +1,6 @@
 ---
 title: ALP.COM API Reference
 
-language_tabs:
-  - python: Python
-  - javascript: Node.js
-
 toc_footers:
   - <a href='https://alp.com/en/register/'>Sign Up for a Developer Key</a>
   - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
@@ -15,867 +11,1057 @@ includes:
 search: true
 ---
 
-
 # Introduction
 
-
-Welcome to ALP.COM API docs!
+Welcome to ALP.COM API v3 docs!
 
 Service ALP.COM provides open API for trading operations and broadcasting of all trading events.
 
-# HTTP API (v1)
+HTTP API endpoint available on [https://alp.com/api/v3/](https://alp.com/api/v3/).
 
+For users currently using API v1, we strongly recommend transitioning to API v3, as API v1 will soon be deprecated and no longer available.
 
-HTTP API endpoint available on [https://alp.com/api/v1/](https://alp.com/api/v1/).
+# Constants
 
-Some methods requires authorization [read below](#authorization).
+### Wallet Types
 
-<aside class="success">
-We have limit in 2 calls per second from single account to authorization required methods and 100 calls per secong from single IP address to public methods.
-</aside>
+ - `SPOT`: Spot Wallet
+ - `MARGIN_CROSS`: Cross Margin Wallet
+ - `MARGIN_ISOLATED`: Isolated Margin Wallet
+ - `FUNDING`: Funding Wallet
 
-All HTTP methods accept `JSON` formats of requests and responses if it not specified by headers.
+### Order Sides
 
-## Authorization
+ - `BUY`: Buy Order
+ - `SELL`: Sell Order
 
-> To generate auth headers, use this code:
+### Order Types
 
-```python
-import hmac
-from time import time
-from urllib.parse import urlencode
+ - `MARKET`: Market Order
+ - `LIMIT`: Limit Order
+ - `STOP_LIMIT`: Stop-Limit Order
+ - `STOP_MARKET`: Stop-Market Order
 
-def get_auth_headers(self, data):
-        msg = 'your key' + urlencode(sorted(data.items(), key=lambda val: val[0]))
+### Order Status
 
-        sign = hmac.new('your keys secret'.encode(), msg.encode(), digestmod='sha256').hexdigest()
+ - `UNDEFINED`: Undefined Order Status
+ - `PENDING`: Pending Order
+ - `OPEN`: Open Order
+ - `CANCELLED`: Cancelled Order
+ - `PARTIAL_CANCELLED`: Partially Cancelled Order
+ - `PARTIAL_FILLED`: Partially Filled Order
+ - `FILLED`: Filled Order
+ - `EXPIRED`: Expired Order
+ - `FAILED`: Failed Order
 
-        return {
-            'X-KEY': 'your key',
-            'X-SIGN': sign,
-            'X-NONCE': str(int(time() * 1000)),
-        }
-```
+### Time in Force
 
-```javascript
-const hmacSha256 = require('crypto-js/hmac-sha256'); // sha256 hash. or use you favorite u like
-const request = require('request'); // for http requests. or use you favorite u like
+ - `GOOD_TILL_CANCEL`: Good 'til Cancelled
+ - `IMMEDIATE_OR_CANCEL`: Immediate or Cancel
+ - `ALL_OR_NONE`: All or None
+ - `FILL_OR_KILL`: Fill or Kill
+ - `UNDEFINED_TIME_IN_FORCE`: Undefined Time in Force
 
-const BASE_URL = 'https://alp.com/api/v1';
-const API_KEY = '0000-0000...';
-const SECRET = 'Z%2........';
+### Side Effects
 
-//Serialize for singing only. Can be used in request body if u like urlencoded form format instead of json
-function serializePayload(payload) {
-  return Object
-    .keys(payload) // get keys of payload object
-    .sort() // sort keys
-    .map((key) => key + "=" + encodeURIComponent(payload[key])) // each value should be url encoded. the most sensitive part for sign checking
-    .join('&'); // to sting, separate with ampersand
-}
+ - `NO_SIDE_EFFECT`: No Side Effect
+ - `AUTO_BORROW`: Auto Borrow
+ - `AUTO_REPLAY`: Auto Replay
 
-// Generates auth headers
-function getAuthHeaders(payload) {
-  // get SHA256 of <API_KEY><sorted urlencoded payload string><SECRET>
-  const sign = hmacSha256(API_KEY + serializePayload(payload), SECRET).toString();
+### Stop Operators
 
-  return {
-    'X-KEY': API_KEY,
-    'X-SIGN': sign,
-    'X-NONCE': Date.now()
-  };
-}
+ - `GTE`: Greater Than or Equal To
+ - `LTE`: Less Than or Equal To
 
-function getWallets(callback) {
-  payload = {};
+### Loan Types
 
-  const options = {
-    method: 'get',
-    url: `${BASE_URL}/wallets/`,
-    headers: getAuthHeaders(payload)
-  };
+ - `AUTO`: Auto Loan Type
+ - `MANUAL`: Manual Loan Type
 
-  request(options, callback);
-}
+### Margin Directions
 
-function createOrder(order, callback) {
-  const options = {
-    method: 'post',
-    url: `${BASE_URL}/order/`,
-    headers: getAuthHeaders(order),
-    form: order, // API accepts urlencoded form or json. Use appropriate headers!
-  };
+ - `ADD`: Add to Margin
+ - `SUB`: Subtract from Margin
 
-  request(options, callback);
-}
+### Deposit Status
 
-// test
-getWallets((error, response, body) => {
-  console.log('error', error);
-  console.log('body', body);
-});
+ - `PENDING`: Pending Deposit
+ - `MODERATION`: In Moderation
+ - `CONFIRMED`: Confirmed Deposit
+ - `REJECTED`: Rejected Deposit
 
-const order = {
-  type: 'buy',
-  pair: 'BTC_USD',
-  amount: '0.0001',
-  price: '0.1'
-};
+### Withdrawal Status
 
-createOrder(order, (error, response, body) => {
-  // get json, etc
-  console.log('error', error);
-  console.log('body', body);
-});
-```
+ - `NEW`: New Withdrawal
+ - `CONFIRMED`: Confirmed Withdrawal
+ - `VERIFIED`: Verified Withdrawal
+ - `MODERATION`: Withdrawal in Moderation
+ - `APPROVED`: Approved Withdrawal
+ - `SUSPENDED`: Suspended Withdrawal
+ - `DONE`: Completed Withdrawal
+ - `REFUSED`: Refused Withdrawal
+ - `CANCELED`: Cancelled Withdrawal
 
-In order for access to private API methods, generate authorization keys [in profile settings](https://alp.com/en/profile/api).
+### Chart Intervals
 
-All request to these methods must contain the following headers:
+ - `FIVE_MIN`: 5 minutes
+ - `FIFTEEN_MINS`: 15 minutes
+ - `HALF_HOUR`: 30 minutes
+ - `HOUR`: 1 hour
+ - `FOUR_HOURS`: 4 hours
+ - `DAY`: 1 day
 
-* X-KEY - your key.
-* X-SIGN - query's POST data, sorted by keys and signed by your key's "secret" according to the HMAC-SHA256 method.
-* X-NONCE - integer value, must be greater then nonce in previous api call.
+# *Public API*
 
+## Currencies
 
-# Currencies
+`GET /api/v3/currencies`
 
-
-## List all currencies
-
-
-```python
-import requests
-
-response = requests.get('https://alp.com/api/v1/currencies/')
-```
-
-```javascript
-var request = require('request');
-
-request.get('https://alp.com/api/v1/currencies/', function (error, response, body) {
-    // process response
-});
-```
-
-> Sample output
+> Response
 
 ```json
 [
   {
     "sign": "Ƀ",
     "short_name": "BTC"
-  },
-  {
-    "sign": "Ξ",
-    "short_name": "ETH"
-  }
+  }, ...
 ]
 ```
 
-Returns information about all available currencies.
+## Pairs
 
-### HTTP Request
+`GET /api/v3/pairs`
 
-`GET https://alp.com/api/v1/currencies/`
+Query Parameters
 
+Parameter | Type    | Description
+--------- |---------| -----------
+currency1 | string  | filter by base currency
+currency2 | integer | filter by quote currency
 
-# Pairs
-
-## List all pairs
-
-
-```python
-import requests
-
-response = requests.get('https://alp.com/api/v1/pairs/')
-```
-
-```javascript
-var request = require('request');
-
-request.get('https://alp.com/api/v1/pairs/', function (error, response, body) {
-    // process response
-});
-```
-
-> Sample output
+> Response
 
 ```json
-[
-  {
-    "name": "BTC_USD",
+[{
+    "name": "BTC/USDT",
     "currency1": "BTC",
-    "currency2": "USD",
+    "currency2": "USDT",
+    "amount_precision": 8,
     "price_precision": 2,
-    "amount_precision": 6,
-    "maximum_order_size": 100000000.00000000,
-    "minimum_order_size": 0.00000001,
-    "liquidity_type": 10
-   }
-]
+    "maximum_order_size": 10.0,
+    "minimum_order_size": 0.001,
+    "minimum_order_value": 10.0
+}, ...]
 ```
 
-Returns information about all available pairs.
+## Tickers
 
-### HTTP Request
+`GET /api/v3/ticker`
 
-`GET https://alp.com/api/v1/pairs/`
+Query Parameters
 
-### Query Parameters
+Parameter | Type    | Description
+--------- |---------| -----------
+pair | string  | pair symbol like `BTC_USDT`
+pair_id | integer | id of pair
 
-Parameter | Default | Description
---------- | ------- | -----------
-currency1 | all | Filter by first currency.
-currency2 | all | Filter by second currency.
-
-
-# Tickers
-
-
-
-```python
-import requests
-
-response = requests.get('https://alp.com/api/v1/ticker/')
-```
-
-```javascript
-var request = require('request');
-
-request.get('https://alp.com/api/v1/ticker/', function (error, response, body) {
-    // process response
-});
-```
-
-> Sample output
+> Response
 
 ```json
-[
-  {
-    "timestamp": 1642511387.55049,
-    "pair": "ETH_BTC",
-    "last": 0.076,
-    "diff": 0,
-    "vol": 0,
-    "high": 0,
-    "low": 0,
-    "buy": 0.071346,
-    "sell": 0.080317
-  }
-]
+[{
+    "pair": "BTC/USD",
+    "last": 45000.0,
+    "vol": 1000.0,
+    "buy": 44990.0,
+    "sell": 45010.0,
+    "high": 45500.0,
+    "low": 44500.0,
+    "diff": 10.0,
+    "timestamp": 1630862400.0
+}, ...]
 ```
 
-Used to fetch last price changes.
+## Orderbook
 
-### HTTP Request
+`GET /api/v3/order_book`
 
-`GET https://alp.com/api/v1/ticker/`
+Query Parameters
 
-### Query Parameters
+Parameter | Type    | Description
+--------- |---------| -----------
+pair | string  | pair symbol like `BTC_USDT`
+group | integer | if set `1` - orders will be grouped by price
+limit_buy | integer  | limit of buy orders
+limit_sell | integer  | limit of sell orders
 
-Parameter | Default | Description
---------- | ------- | -----------
-pair | all | Filter by pair symbol(e.g. BTC_USD)
-
-# Charts
-```python
-import requests
-
-params = {
-    'limit': 1
-    }
-
-response = requests.get('https://alp.com/api/charts/BTC_USD/60/chart', params = params)
-```
-
-```javascript
-var request = require('request');
-
-var params = {limit: 1};
-
-request.get({
-                url: 'https://alp.com/api/charts/BTC_USD/60/chart',
-                qs: params
-            }, function (error, response, body) {
-                // process response
-            }
-);
-```
-
-> Sample output
+> Response
 
 ```json
-[
-  {
-    "volume": 0.262929,
-    "high": 912.236,
-    "low": 910.086,
-    "close": 911.915,
-    "time": 1485777600,
-    "open": 910.424
-   }
-]
+{
+    "buy": [
+        {
+            "amount": 1.0,
+            "price": 45000.0
+        },
+        {
+            "amount": 2.0,
+            "price": 44990.0
+        }
+    ],
+    "sell": [
+        {
+            "amount": 1.0,
+            "price": 45010.0
+        },
+        {
+            "amount": 2.0,
+            "price": 45020.0
+        }
+    ]
+}
 ```
 
-### Timeframes
+## Charts
 
-Value | Description
---------- | -------
-5 | 5 minutes
-15 | 15 minutes
-30 | 30 minutes
-60 | 1 hour
-240 | 4 hours
-D | 1 day
+`GET /api/v3/charts`
 
-### HTTP Request
+Query Parameters
 
-`GET https://alp.com/api/charts/<pair_symbol>/<timeframe>/chart`
+Parameter | Type    | Description
+--------- |---------| -----------
+pair | string  | pair symbol like `BTC_USDT`, **required**
+interval | string  | time interval, **required**
+since | integer | timestamp, filter from
+until | integer | timestamp, filter to 
+limit | integer | timestamp, limit of candles
 
-### Query Parameters
+> Response
 
-Parameter | Default | Description
---------- | ------- | -----------
-limit | 720 | Limiting results
-since | - | Since Timestamp
-until | - | Until Timestamp
+```json
+[{
+    "open": 45000.0,
+    "close": 45100.0,
+    "high": 45200.0,
+    "low": 44900.0,
+    "volume": 1000.0,
+    "time": 1630862400.0
+}, ...]
+```
 
-# Wallets
+## Trades
 
+`GET /api/v3/trades`
 
-## List own wallets
+Query Parameters
 
-```python
-import requests
+Parameter | Type    | Description
+--------- |---------| -----------
+pair | string  | pair symbol like `BTC_USDT`
+limit | integer | limit of records
+offset | integer | offset of records
 
-response = requests.get('https://alp.com/api/v1/wallets/', headers = get_auth_headers({}))
+> Response
+
+```json
+[{
+    "id": 1,
+    "account_id": 101,
+    "pair": "BTC/USDT",
+    "amount": 2.5,
+    "price": 45000.0,
+    "timestamp": 1630862400.0,
+    "type": "buy"
+}, ...]
 ```
 
 
-```javascript
-var request = require('request');
+# *Private API*
 
-request.get(
-    'https://alp.com/api/v1/wallets/',
-    {
-        headers: getAuthHeaders({})
+## Authorization
+
+To access private API, clients must use JWT tokens for authentication. Tokens must be included in the Authorization header as follows: `Authorization: Bearer {token}`
+
+
+### Token Expiration
+Clients should check the key `exp` in the JWT token payload, which contains a timestamp indicating the token's expiration time. Tokens are valid until this time.
+
+### Obtaining JWT Tokens
+JWT token generates by API Key and API Secret. 
+The API Key pair can be generated in user profile, by link `https://alp.com/en/profile/api`
+To generate it, make a POST request to the following endpoint: `https://alp.com/api/v3/auth` with body
+```json
+{
+  "api_key": "<Your API Key>",
+  "api_secret": "<Your API Secret>"
+}
+```
+
+### POST Method Signature (X-SIGN Header)
+For POST requests, clients must include a request signature in the `X-SIGN` header. 
+Calculate this signature as the HMAC SHA-256 hash of the request body using the `api_secret` obtained earlier.
+
+
+## Accounts
+
+`GET /api/v3/accounts/accounts`
+
+Query Parameters
+
+Parameter | Type    | Description
+--------- |---------| -----------
+include_subaccounts | bool | if set true, all subaccounts for account are returned as well
+
+Response
+
+```json
+[{
+    "id": 123,
+    "email": "example@email.com",
+    "name": "John Doe",
+    "parent_id": null
+}]
+```
+
+where:
+`parent_id` - for sub accounts it indicates id of master account
+
+
+## Account Balances
+
+`GET /api/v3/accounts/balances`
+
+Response
+
+```json
+[{
+    "balance": 1000.0,
+    "reserve": 500.0,
+    "currency": "USDT",
+    "wallet_type": "SPOT",
+    "last_update_at": "2023-09-04T12:00:00Z",
+    "account_id": 12345
+}
+...]
+```
+where:
+`reserve` - balance in open orders, pending withdraws, etc.
+
+
+## Fee Info
+
+`GET /api/v3/accounts/feeinfo`
+
+Response
+
+```json
+[{
+    "account_id": 12345,
+    "active_once": ["2023-09-04T12:00:00Z", "2023-09-05T12:00:00Z"],
+    "taker_fee_rate": 0.002,
+    "maker_fee_rate": 0.0015,
+    "fee_currency": "USD",
+    "priority": 1,
+    "currency": null,
+    "pair": null,
+    "is_active": true
+}...]
+```
+
+## Orders
+
+`GET /api/v3/accounts/order`
+
+Query Parameters
+
+| Parameter | Type    | Description|
+|-----------|---------| -----------|
+| pair      | string  | pair symbol like `BTC_USDT`|
+| open_only | bool    | if set and true returns open order only|
+| side      | string  | if set must be rather `BUY` or `SELL`|
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
+| end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+```json
+[{
+    "id": 123,
+    "account_id": 456,
+    "pair": "BTC/USDT",
+    "amount": 1.5,
+    "price": 45000.0,
+    "side": "BID",
+    "status": "FILLED",
+    "type": "LIMIT",
+    "wallet_type": "SPOT",
+    "amount_canceled": 0.0,
+    "amount_filled": 1.5,
+    "date": "2023-09-04T12:00:00Z",
+    "open_at": "2023-09-04T11:59:00Z",
+    "tif": "GTC",
+    "updated_at": "2023-09-04T12:01:00Z",
+    "done_at": null,
+    "expire_after": null,
+    "stop_price": null
+} ...]
+```
+
+## Account Trades
+
+`GET /api/v3/accounts/trades`
+
+Query Parameters
+
+
+Parameter | Type    |   Description
+--------- |---------| ----------------------
+pair | string  | pair symbol like `BTC_USDT`
+side | string  | if set must be rather `BUY` or `SELL`
+start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`
+end_time | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+```json
+[{
+    "account_id": 12345,
+    "pair": "BTC/USD",
+    "amount": 1.0,
+    "amount_unfilled": 0.5,
+    "price": 45000.0,
+    "currency": "USD",
+    "status": "FILLED",
+    "date": "2023-09-04T12:00:00Z",
+    "fee_amount": 0.005,
+    "fee_currency": "USD",
+    "fee_rate": 0.005,
+    "is_maker": true,
+    "type": "LIMIT",
+    "wallet_type": "SPOT"
+}, ...]
+```
+
+
+## Operation History
+
+`GET /api/v3/accounts/activity`
+
+Query Parameters
+
+| Parameter | Type    |   Description|
+|-----------|---------| ----------------------|
+| currency  | string  | currency symbol like `BTC`|
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
+| end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+Response
+
+```json
+[{
+    "id": 1,
+    "account_id": 12345,
+    "wallet_id": 67890,
+    "type": "DEPOSIT",
+    "balance": 1000.0,
+    "balance_delta": 500.0,
+    "balance_end": 1500.0,
+    "reserve": 100.0,
+    "reserve_delta": 50.0,
+    "reserve_end": 150.0,
+    "currency": "USDT",
+    "wallet_type": "SPOT",
+    "date": "2023-09-04T12:00:00Z"
+}...]
+```
+
+
+## Deposit Methods
+
+`GET /api/v3/deposit/methods`
+
+Query Parameters
+
+| Parameter | Type    | Description                            |
+|-----------|---------|----------------------------------------|
+| currency  | string  | currency symbol like `BTC` (required!) |
+
+Response
+
+```json
+[{
+    "network": "Example Network",
+    "currency": "USDT",
+    "attributes": [
+        {
+            "key": "address",
+            "value": "0x1234567890abcdef"
+        },
+        {
+            "key": "memo",
+            "value": "123456"
+        }
+    ],
+    "confirmations": 6,
+    "min_deposit": 10.0,
+    "max_deposit": 1000.0,
+    "is_enabled": true
+}, ...]
+```
+
+## Deposit History
+
+`GET /api/v3/deposit`
+
+Query Parameters
+
+| Parameter | Type    |   Description|
+|-----------|---------| ----------------------|
+| currency  | string  | currency symbol like `BTC`|
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
+| end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
+
+Response
+
+```json
+[{
+    "id": 123,
+    "amount": 100.0,
+    "currency": "BTC",
+    "status": "PENDING",
+    "tx_hash": "0xabc123def456",
+    "date": "2023-09-04T12:00:00Z"
+}, ...]
+```
+
+## Withdraw Methods
+
+`GET /api/v3/withdraw/methods`
+
+Query Parameters
+
+| Parameter | Type    | Description                            |
+|-----------|---------|----------------------------------------|
+| currency  | string  | currency symbol like `BTC` (required!) |
+
+
+Response
+
+```json
+[{
+    "id": 123,
+    "network": "ETH",
+    "currency": "USD",
+    "attributes": [
+        {
+            "key": "address",
+            "value": "0x1234567890abcdef"
+        },
+        {
+            "key": "memo",
+            "value": "123456"
+        }
+    ],
+    "fee_rate": 0.002,
+    "fee_amount": 5.0,
+    "fee_currency": "USD",
+    "min_withdraw": 10.0,
+    "max_withdraw": 1000.0,
+    "is_enabled": true
+}
+, ...]
+```
+
+> **Note**
+>
+> This method is disabled by default, set "Can Withdraw" during creation of an API-Key to use it.
+
+
+## Withdraw Request
+
+`POST /api/v3/withdraw`
+
+Query Body
+
+```json
+{
+    "amount": 50.0,
+    "method": 123,
+    "attributes": {
+        "address": "0xabcdef1234567890",
+        "memo": "123456"
     },
-    function (error, response, body) {
-        // process response
-    }
-);
+    "client_order_id": "withdraw-1"
+}
 ```
 
-> Sample output
+> **Note**
+>
+> This method is disabled by default, set "Can Withdraw" during creation of an API-Key to use it.
+
+
+## Withdraw History
+
+`GET /api/v3/withdraw`
+
+Query Parameters
+
+| Parameter | Type    |   Description|
+|-----------|---------| ----------------------|
+| currency  | string  | currency symbol like `BTC`|
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
+| end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
+
+Response
 
 ```json
-[
-  {
+[{
+    "id": 123,
+    "amount": 50.0,
+    "fee_amount": 2.0,
     "currency": "BTC",
-    "balance": 0.00000000,
-    "reserve": 0.00000000
-   }
-]
-```
-
-Returns information about all wallets of account.
-
-### HTTP Request
-
-`GET https://alp.com/api/v1/wallets/`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-currency_id | all | Filter by currency.
-
-<aside class="warning">
-This method requires authorization.
-</aside>
-
-
-# Orders
-
-## Order statuses
-
-Value | Status name | Description
---------- |  ----------- | -----------
-1 | Active | Order in queue for executing
-2 | Canceled | Order not active, permanently
-3 | Done | Order fully executed
-
-
-## Get orderbook
-
-```python
-import requests
-
-params = {
-    limit_bids: 1,
-    limit_asks: 1,
+    "fee_currency": "BTC",
+    "status": "COMPLETED",
+    "tx_hash": "0xabcdef1234567890",
+    "date": "2023-09-04T12:00:00Z"
 }
-
-response = requests.get('https://alp.com/api/v1/orderbook/BTC_USD', params=params)
+, ...]
 ```
 
-```javascript
-var request = require('request');
+> **Note**
+>
+> This method is disabled by default, set "Can Withdraw" during creation of an API-Key to use it.
 
-var url = 'https://alp.com/api/v1/orderbook/BTC_USD';
 
-var params = {
-    limit_bids: 1,
-    limit_asks: 1
-};
+## Place Order
 
-request.get({url: url, qs: params}, function (error, response, body) {
-        // process response
-    }
-);
+`POST /api/v3/trading/order`
+
+
+Query Body
+
+Limit Order
+```json
+{
+    "pair": "BTC/USD",
+    "order_side": "BID",
+    "client_order_id": "1",
+    "wallet_type": "SPOT",
+    "side_effect": "NO_SIDE_EFFECT",
+    "valid_till": null,
+    "expire_after": null,
+    "base_amount": 1.0,
+    "limit_price": 45000.0,
+    "order_type": "LIMIT",
+    "tif": "GTC"
+}
 ```
 
-> Sample output
+Market Order
+```json
+{
+    "pair": "BTC/USD",
+    "order_side": "BID",
+    "client_order_id": "1",
+    "wallet_type": "SPOT",
+    "side_effect": "NO_SIDE_EFFECT",
+    "valid_till": null,
+    "expire_after": null,
+    "base_amount": null,
+    "quote_amount": null,
+    "order_type": "MARKET"
+}
+```
+
+Stop Limit Order
+```json
+{
+    "pair": "BTC/USD",
+    "order_side": "BID",
+    "client_order_id": "1",
+    "wallet_type": "SPOT",
+    "side_effect": "NO_SIDE_EFFECT",
+    "valid_till": null,
+    "expire_after": null,
+    "base_amount": 1.0,
+    "limit_price": 45000.0,
+    "stop_price": 44000.0,
+    "stop_operator": "GTE",
+    "order_type": "STOP_LIMIT",
+    "tif": "GTC"
+}
+```
+
+Response
+
+```
+[34]
+```
+Array of order ids
+
+
+## Cancel Order
+
+`DELETE /api/v3/trading/order`
+
+Query Body
 
 ```json
 {
-  "sell": [
-    {
-      "price": 911.519,
-      "amount": 0.000446
-     }
-   ],
-  "buy": [
-    {
-      "price": 911.122,
-      "amount": 0.001233
-    }
-  ]
+  "order_ids": [1, 5, 8],
+  "all": false,
+  "pair": ""
 }
 ```
+> **Note**
+>
+> rather `order_ids` or `all`=`true` must be specified. If `all`=`true`, `pair` can be specified to cancel all orders for one specific pair
 
-Get full orderbook of **active** orders
+Response
 
-### HTTP Request
-
-`GET https://alp.com/api/v1/orderbook/<pair_name>`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-limit_sell | all | Sell orders limit
-limit_buy | all | Buy orders limit
-group | 0 | If set 1, then order will grouped by price
+`202`,
+`204` (no orders to cancels by specified params),
+`400`, `401`
 
 
-## List own orders
+## Margin Transfer
 
-```python
-import requests
+`POST /api/v3/margin/transfer`
 
-response = requests.get('https://alp.com/api/v1/orders/own/', headers = get_auth_headers({}))
-```
-
-```javascript
-var request = require('request');
-
-request.get('https://alp.com/api/v1/orders/own/', {headers: getAuthHeaders({})}, function (error, response, body) {
-    // process response
-});
-```
-
-> Sample output
-
-```json
-[
-  {
-    "amount": 0.500000000,
-    "pair": "ETH_USD",
-    "type": "buy",
-    "status": 3,
-    "price": 0.00113000,
-    "id": 11249
-  }
-]
-```
-
-<aside class="warning">
-This method requires authorization.
-</aside>
-
-List all orders created in your account. Can be filtered by query parameters.
-
-### HTTP Request
-
-`GET https://alp.com/api/v1/orders/own/`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-type | all | Filter by orders type (sell or buy).
-pair | none | Filter by pair.
-status | all | Filter by status.
-limit | 2000 | Limiting results.
-
-## Retrieve single order
-
-
-```python
-import requests
-
-oid = 53189
-
-response = requests.get('https://alp.com/api/v1/order/{}/'.format(oid))
-```
-
-```javascript
-var request = require('request');
-
-var oid = 53189;
-
-request.get('https://alp.com/api/v1/order/' + oid + '/', function (error, response, body) {
-    // process response
-});
-```
-
-> Sample output
+Query Body
 
 ```json
 {
-  "id": 11259,
-  "date": 1478025717394,
-  "pair": "BTC_USD",
-  "type": "buy",
-  "price": 870.69000000,
-  "amount": 0.1250000,
-  "amount_filled": "0.00419580",
-  "amount_original": 0.0041958,
-  "status": "1"
+    "account_id": 12345,
+    "wallet_type": "SPOT",
+    "direction": "ADD",
+    "amount": 100.0,
+    "currency": "USDT",
+    "pair": null,
+    "note": null
 }
 ```
 
-Get detailed information about order by its id
+Response:
+integer - transfer id
 
-### HTTP Request
-
-`GET https://alp.com/api/v1/order/<pk>/`
-
-
-## Create order
+> **Note**
+>
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
 
-```python
-import requests
+## Margin Borrow
 
-order = {
-    type: 'buy',
-    pair: 'BTC_USD',
-    amount: '1.0',
-    price: '870.69'
-}
+`POST /api/v3/margin/borrow`
 
-response = requests.post('https://alp.com/api/v1/order/', data = order, headers = get_auth_headers(order))
-```
-
-```javascript
-var request = require('request');
-
-var order = {
-    type: 'buy',
-    pair: 'BTC_USD',
-    amount: '1.0',
-    price: '870.69'
-};
-
-request.post({
-                url: 'https://alp.com/api/v1/order/',
-                form: order,
-                headers: getAuthHeaders(order)
-            }, function (error, response, body) {
-                // process response
-                // save order id, check if it's executed
-            }
-);
-```
-
-> Sample output
+Query Body
 
 ```json
 {
-  "success": true,
-  "type": "buy",
-  "date": 1483721079.51632,
-  "oid": 11268,
-  "price": 870.69000000,
-  "amount": 0.00000000,
-  "trades": [
-    {
-      "type": "sell",
-      "price": 870.69000000,
-      "o_id": 11266,
-      "amount": 0.00010000,
-      "tid": 6049
-    }
-  ]
+    "account_id": 12345,
+    "borrow": 100.0,
+    "currency": "USD",
+    "wallet_type": "SPOT",
+    "pair": null,
+    "type": "LOAN_MANUAL"
 }
 ```
 
-<aside class="warning">
-This method requires authorization.
-</aside>
+Response:
+integer - borrow id
 
-Create new order that will be automatically executed.
-
-### HTTP Request
-
-`POST https://alp.com/api/v1/order/`
-
-### POST params
-
-Parameter | Description
---------- | -----------
-type | Type of order (`sell` or `buy`).
-pair | Pair of order
-amount | Amount of first currency of pair.
-price | Price of order. This param have limited precision (See [pairs](#pairs)).
+> **Note**
+>
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
 
-## Cancel order
+## Margin Repay
 
+`POST /api/v3/margin/repay`
 
-```python
-import requests
-
-data = {
-    order: 63568
-}
-
-response = requests.post('https://alp.com/api/v1/order-cancel/', data = data, headers = get_auth_headers(data))
-```
-
-```javascript
-var request = require('request');
-
-var data = {
-    order: 63568
-};
-
-request.post({
-        url: 'https://alp.com/api/v1/order-cancel/',
-        form: data,
-        headers: getAuthHeaders(data)
-    }, function (error, response, body) {
-        // process response
-    }
-);
-```
-
-> Sample output
+Query Body
 
 ```json
 {
-  "order": 63568
+    "account_id": 12345,
+    "amount": 100.0,
+    "currency": "USD",
+    "wallet_type": "SPOT",
+    "pair": null,
+    "type": "LOAN_MANUAL"
 }
 ```
 
-<aside class="warning">
-This method requires authorization.
-</aside>
+Response:
+integer - repay id
 
-Cancel your **active** order. If order not exists, it's done or cancelled error message will be returned.
-
-### HTTP Request
-
-`POST https://alp.com/api/v1/order-cancel/`
-
-### POST params
-
-Parameter | Description
---------- | -----------
-order | ID of order to cancel
+> **Note**
+>
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
 
-# Exchanges
+### Close Position
 
+`DELETE /api/v3/margin`
 
-## List all exchanges
-
-
-```python
-import requests
-
-response = requests.get('https://alp.com/api/v1/exchanges/')
-```
-
-```javascript
-var request = require('request');
-
-request.get('https://alp.com/api/v1/exchanges/', function (error, response, body) {
-    // process response
-});
-```
-
-> Sample output
+Query Body
 
 ```json
-[
-  {
-    "id": 6030,
-    "account_id": 384360,
-    "price": 839.36000000,
-    "pair": "BTC_USD",
-    "type": "sell",
-    "timestamp": 1483705817.735508,
-    "amount": 0.00281167
-  }
-]
+{
+  "pair": "BTC_USDT",
+  "wallet_type": "ISOLATED_MARGIN"
+}
 ```
 
+> **Note**
+>
+> rather `ISOLATED_MARGIN` or `CROSS_MARGIN` must be set to `wallet_type`
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-### HTTP Request
+Response
 
-`GET https://alp.com/api/v1/exchanges/`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-pair | all | Filter by pair.
-limit | 100 | Limiting results.
-offset | 0 | Skip number of records.
-ordering | -id | Ordering parameter. `id` - ascending sorting, `-id` - descending sorting.
+`202`, `400`, `401`
 
 
-## List own exchanges
+## Margin Loans
 
-<aside class="warning">
-This method requires authorization.
-</aside>
+`GET /api/v3/margin`
 
-List only own exchanges where your account was buyer or seller.
+Query Parameters
 
-### HTTP Request
+| Parameter  | Type | Description|
+|------------|--| -----------|
+| isolated_margin | bool |  if set true isolated margin positions are returned |
+| cross_margin   | bool |  if set true cross margin positions are returned |
 
-`GET https://alp.com/api/v1/exchanges/own/`
+> **Note**
+>
+> rather `isolated_margin` or `cross_margin` must be set true
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-type | all | Filter by orders type (sell or buy).
-pair | all | Filter by pair.
-limit | 100 | Limiting results.
-offset | 0 | Skip number of records.
-ordering | -id | Ordering parameter. `id` - ascending sorting, `-id` - descending sorting.
-
-
-# Deposits
-
-
-## List own deposits
-
-```python
-import requests
-
-response = requests.get('https://alp.com/api/v1/deposits/', headers = get_auth_headers({}))
-```
-
-```javascript
-var request = require('request');
-
-request.get({
-                url: 'https://alp.com/api/v1/deposits/',
-                headers: getAuthHeaders({})
-            }, function (error, response, body) {
-                // process response
-            }
-);
-```
+Response
 
 ```json
-[
-  {
-    "timestamp": 1485363039.18359,
-    "id": 317,
-    "currency": "BTC",
-    "amount": 530.00000000
-  }
-]
+[{
+    "id": 123,
+    "account_id": 456,
+    "borrowed": 1000.0,
+    "interest": 50.0,
+    "currency": "USD",
+    "wallet_type": "SPOT"
+}, ...]
 ```
 
-<aside class="warning">
-This method requires authorization.
-</aside>
-
-List your deposits
-
-### HTTP Request
-
-`GET https://alp.com/api/v1/deposits/`
 
 
-# Withdraws
+## Margin Transfer History
 
-## Withdraw statuses
+`GET /api/v3/margin/transfer`
 
-Value | Status name | Description
---------- | ----------- | -----------
-10 | New | Withdraw created, verification need
-20 | Verified | Withdraw verified, waiting for approving
-30 | Approved | Approved by moderator
-40 | Refused | Refused by moderator. See your email for more details
-50 | Canceled | Cancelled by user
+Query Parameters
 
-## List own made withdraws
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| open_only  | bool    | if set and true returns open order only                     |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-```python
-import requests
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
-response = requests.get('https://alp.com/api/v1/withdraws/', headers: get_auth_headers({}))
-```
+Response
 
-```javascript
-var request = require('request');
-
-request.get({
-        url: 'https://alp.com/api/v1/withdraws/',
-        headers: getAuthHeaders({})
-    }, function (error, response, body) {
-        // process response
-    }
-);
-```
-
-> Sample output
-
+`200` -
 ```json
-[
-  {
-    "id": 403,
-    "timestamp": 1485363466.868539,
-    "currency": "BTC",
-    "amount": 0.53000000,
-    "status": 20
-  }
-]
+[{
+    "id": 123,
+    "account_id": 456,
+    "amount": 100.0,
+    "currency": "USD",
+    "date": "2023-09-04T12:00:00Z",
+    "direction": "ADD",
+    "wallet_type": "SPOT",
+    "note": "Transfer from Spot to Margin",
+    "pair": "BTC/USD"
+}, ...]
 ```
+`400`,
+`401`
 
-<aside class="warning">
-This method requires authorization.
-</aside>
 
-Get list of your withdraws
+## Margin Borrow History
 
-### HTTP Request
+`GET /api/v3/margin/borrow`
 
-`GET https://alp.com/api/v1/withdraws/`
+Query Parameters
 
-### Query Parameters
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| open_only  | bool    | if set and true returns open order only                     |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-Parameter | Default | Description
---------- | ------- | -----------
-currency_id | all | Filter currency.
-status | all | Filter by status.
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+Response
+
+`200` -
+```json
+[{
+    "id": 123,
+    "account_id": 456,
+    "borrowed": 1000.0,
+    "date": "2023-09-04T12:00:00Z",
+    "interest_accrued": 50.0,
+    "interest_paid": 10.0,
+    "interest_rate": 0.05,
+    "repaid": 0.0,
+    "last_interest_at": null,
+    "opened_at": "2023-09-04T11:00:00Z",
+    "type": "AUTO",
+    "wallet_type": "SPOT"
+}, ...]
+```
+`400`,
+`401`
+
+
+
+## Margin Repay History
+
+`GET /api/v3/margin/repay`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+Response
+
+`200` -
+```json
+[{
+    "id": 123,
+    "account_id": 456,
+    "interest_amount": 10.0,
+    "principal_amount": 100.0,
+    "currency": "USDT",
+    "date": "2023-09-04T12:00:00Z",
+    "type": "AUTO",
+    "wallet_type": "SPOT"
+}
+...]
+```
+`400`,
+`401`
+
+
+## Margin Interest History
+
+`GET /api/v3/margin/interest`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+Response
+
+`200` -
+```json
+[{
+    "id": 123,
+    "account_id": 456,
+    "borrow_id": 789,
+    "currency": "USDT",
+    "interest_accrued": 50.0,
+    "interest_paid": 10.0,
+    "interest_rate": 0.05,
+    "wallet_type": "SPOT"
+}, ...]
+```
+`400`,
+`401`
+
+
+
+## Margin Liquidation History
+
+`GET /api/v3/margin/liquidation`
+
+Query Parameters
+
+| Parameter  | Type    | Description                                                 |
+|------------|---------|-------------------------------------------------------------|
+| pair       | string  | pair symbol like `BTC_USDT`                                 |
+| currency   | string  | currency symbol like `BTC`                                  |
+| open_only  | bool    | if set and true returns open order only                     |
+| start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
+| end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+Response
+
+`200` -
+```json
+[{
+  "id": 293878,
+  "account_id": 25,
+  "created_at": "2022-10-06T08:28:06.801064-04:00",
+  "wallet_type": "ISOLATED_MARGIN",
+  "margin_level": 0.002,
+  "closed_at": "",
+  "amount": 0.015,
+  "fund_amount": 0.03,
+  "currency": "ETH",
+  "order_closed": [1, 3],
+  "order_created": [5],
+  "borrow_closed": [22, 41],
+  "repay_created": [54]
+}...]
+```
+`400`,
+`401`
+
