@@ -1948,19 +1948,27 @@ The service is available on <a href="wss://www.alp.com/alp-ws">wss://www.alp.com
 </span></code></pre></div><h2 id='ticker'>Ticker</h2>
 <p>Topics: <code>ticker.*</code>, <code>ticker.XXX_YYY</code></p>
 
-<p>Message Fields
-1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;tk,&quot; indicating that it&#39;s a ticker message.
-2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the ticker data.
-3. <strong>Payload (Index 2):</strong> The payload is an array containing trading pairs and their corresponding ticker information. Each trading pair is represented as an array with the following fields:
-- Trading Pair Symbol
-- Close Price
-- Base Volume
-- Quote Volume
-- Change Percent
-- High Price
-- Low Price
-- Bid Price
-- Ask Price</p>
+<p>Fields:</p>
+
+<ul>
+<li><code>Type</code>: The type of the message is set to &quot;tk,&quot; indicating that it&#39;s a ticker message.</li>
+<li><code>Timestamp</code>: The Unix timestamp of the ticker data.</li>
+<li><code>Payload</code>. The payload is an array containing trading pairs and their corresponding ticker information. </li>
+</ul>
+
+<p>Each trading pair is represented as an array with the following fields:</p>
+
+<ul>
+<li>Trading Pair Symbol</li>
+<li>Close Price</li>
+<li>Base Volume</li>
+<li>Quote Volume</li>
+<li>Change Percent</li>
+<li>High Price</li>
+<li>Low Price</li>
+<li>Bid Price</li>
+<li>Ask Price</li>
+</ul>
 
 <blockquote>
 <p>Example</p>
@@ -1981,14 +1989,17 @@ The service is available on <a href="wss://www.alp.com/alp-ws">wss://www.alp.com
 </span></code></pre></div><h2 id='trade'>Trade</h2>
 <p>Topics: <code>trade.*</code>, <code>trade.XXX_YYY</code></p>
 
-<p>Message Fields
-1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;t,&quot; indicating that it&#39;s a trade event.
-2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the trade event.
-3. <strong>Trade ID (Index 2):</strong> A unique identifier for the trade event.
-4. <strong>Trading Pair Symbol (Index 3):</strong> The symbol representing the trading pair associated with the trade.
-5. <strong>Trade Amount (Index 4):</strong> The amount of the trade, converted to a string.
-6. <strong>Trade Price (Index 5):</strong> The price of the trade, converted to a string.
-7. <strong>Trade Direction (Index 6):</strong> The direction of the trade, either &quot;buy&quot; or &quot;sell.</p>
+<p>Fields:</p>
+
+<ul>
+<li><code>Type</code>: The type of the message is set to &quot;t,&quot; indicating that it&#39;s a trade event.</li>
+<li><code>Timestamp</code>: The Unix timestamp of the trade event.</li>
+<li><code>Trade ID</code>: A unique identifier for the trade event.</li>
+<li><code>Trading Pair Symbol</code>: The symbol representing the trading pair associated with the trade.</li>
+<li><code>Trade Amount</code>: The amount of the trade, converted to a string.</li>
+<li><code>Trade Price</code>: The price of the trade, converted to a string.</li>
+<li><code>Trade Direction</code>: The direction of the trade, either &quot;buy&quot; or &quot;sell.</li>
+</ul>
 
 <blockquote>
 <p>Example</p>
@@ -2005,13 +2016,21 @@ The service is available on <a href="wss://www.alp.com/alp-ws">wss://www.alp.com
 </span></code></pre></div><h2 id='rates'>Rates</h2>
 <p>Topics: <code>rates.*</code>, <code>rates.XXX_YYY</code></p>
 
-<p>Message Fields
-1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;r,&quot; indicating that it&#39;s a rates event.
-2. <strong>Date (Index 1):</strong> The Unix timestamp of the trade event.
-3. <strong>Payload (Index 3)</strong> The payload is an array containing rate information. Each rate is represented as an array with the following fields:
-- Rate Value
-- Base Currency Code
-- Quote Currency Code</p>
+<p>Fields:</p>
+
+<ul>
+<li><code>Type</code>: The type of the message is set to &quot;r,&quot; indicating that it&#39;s a rates event.</li>
+<li><code>Timestamp</code>: The Unix timestamp of the trade event.</li>
+<li><code>Payload</code>: The payload is an array containing rate information. </li>
+</ul>
+
+<p>Each rate is represented as an array with the following fields:</p>
+
+<ul>
+<li>Rate Value</li>
+<li>Base Currency Code</li>
+<li>Quote Currency Code</li>
+</ul>
 
 <blockquote>
 <p>Example</p>
@@ -2028,13 +2047,16 @@ The service is available on <a href="wss://www.alp.com/alp-ws">wss://www.alp.com
 </span></code></pre></div><h2 id='orderbook-diff'>Orderbook Diff</h2>
 <p>Topics: <code>diff.XXX_YYY</code></p>
 
-<p>Message Fields
-1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;d,&quot; indicating that it&#39;s a market depth difference event.
-2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the market depth difference data.
-3. <strong>Payload (Index 2):</strong> The payload is an array containing market depth difference information. It includes the following fields:
-- Symbol: The trading symbol associated with the market depth.
-- Asks: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.
-- Bids: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.</p>
+<p>Fields:</p>
+
+<ul>
+<li><code>Type</code>: The type of the message is set to &quot;d,&quot; indicating that it&#39;s a market depth difference event.</li>
+<li><code>Timestamp</code>: The Unix timestamp of the market depth difference data.</li>
+<li><code>Payload</code>: The payload is an array containing market depth difference information. It includes the following fields:</li>
+<li><code>Symbol</code>: The trading symbol associated with the market depth.</li>
+<li><code>Asks</code>: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.</li>
+<li><code>Bids</code>: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.</li>
+</ul>
 
 <blockquote>
 <p>Example</p>
@@ -2051,15 +2073,23 @@ The service is available on <a href="wss://www.alp.com/alp-ws">wss://www.alp.com
 </span></code></pre></div><h2 id='market-depth'>Market Depth</h2>
 <p>Topics: <code>market_depth.XXX_YYY</code></p>
 
-<p>Message Fields
-1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;p,&quot; indicating that it&#39;s a market depth event.
-2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the market depth data.
-3. <strong>Payload (Index 2):</strong> The payload is an array containing market depth information represented by the &quot;depthDTO&quot; structure. It includes the following fields:
-- Asks: A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
-- Bids: A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
-- Symbol: The trading symbol associated with the market depth.
-- TotalAsks: The total quantity of asks.
-- TotalBids: The total quantity of bids.</p>
+<p>Fields:</p>
+
+<ul>
+<li><code>Type</code>: The type of the message is set to &quot;p,&quot; indicating that it&#39;s a market depth event.</li>
+<li><code>Timestamp</code>: The Unix timestamp of the market depth data.</li>
+<li><code>Payload</code>: The payload is an array containing market depth information</li>
+</ul>
+
+<p>. It includes the following fields:</p>
+
+<ul>
+<li>A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.</li>
+<li>A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.</li>
+<li>The trading symbol associated with the market depth.</li>
+<li>TotalAsks: The total quantity of asks.</li>
+<li>TotalBids: The total quantity of bids.</li>
+</ul>
 
 <blockquote>
 <p>Example</p>
