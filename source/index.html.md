@@ -76,7 +76,7 @@ private_api = factories.get_private_api(
  - `EXPIRED`: Expired Order
  - `FAILED`: Failed Order
 
-### Time in Force
+### Order Time in Force
 
  - `GOOD_TILL_CANCEL`: Good 'til Cancelled
  - `IMMEDIATE_OR_CANCEL`: Immediate or Cancel
@@ -84,18 +84,18 @@ private_api = factories.get_private_api(
  - `FILL_OR_KILL`: Fill or Kill
  - `UNDEFINED_TIME_IN_FORCE`: Undefined Time in Force
 
-### Side Effects
+### Order Side Effects
 
  - `NO_SIDE_EFFECT`: No Side Effect
  - `AUTO_BORROW`: Auto Borrow
  - `AUTO_REPLAY`: Auto Replay
 
-### Stop Operators
+### Order Stop Operators
 
  - `GTE`: Greater Than or Equal To
  - `LTE`: Less Than or Equal To
 
-### Loan Types
+### Margin Loan Types
 
  - `AUTO`: Auto Loan Type
  - `MANUAL`: Manual Loan Type
@@ -812,6 +812,19 @@ Body Parameters
 }
 ```
 
+```python
+from alpcom_api import dto
+
+req_limit = dto.LimitOrderRequest(
+    pair='ETH_USDT',
+    order_side=dto.OrderSide.SELL,
+    base_amount=0.05,
+    limit_price=1800,
+)
+
+private_api.trading().place_order(req_limit)
+```
+
 > Market Order Request
 
 ```json
@@ -827,6 +840,18 @@ Body Parameters
     "quote_amount": null,
     "order_type": "MARKET"
 }
+```
+
+```python
+from alpcom_api import dto
+
+req_market = dto.MarketOrderRequest(
+    pair='ETH_USDT',
+    order_side=dto.OrderSide.SELL,
+    base_amount=0.1 # base_amount or quote_amount
+)
+
+private_api.trading().place_order(req_market)
 ```
 
 > Stop Limit Order Request
@@ -852,14 +877,16 @@ Body Parameters
 ```python
 from alpcom_api import dto
 
-req_limit = dto.LimitOrderRequest(
+req_stop_limit = dto.StopLimitOrderRequest(
     pair='ETH_USDT',
     order_side=dto.OrderSide.SELL,
+    stop_price=1800,
+    stop_operator=dto.StopOperator.GTE,
     base_amount=0.05,
-    limit_price=1800,
+    limit_price=1700,
 )
 
-private_api.trading().place_order(req_limit)
+private_api.trading().place_order(req_stop_limit)
 ```
 
 > Response, (Array of created order ids)
@@ -1350,3 +1377,217 @@ private_api.margin().liquidations('ETH', start_time=None, end_time=None)
 >
 > `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 > This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+
+# *WebSocket API*
+
+The WebSocket service by Alp Exchange is a real-time communication platform for traders. 
+It offers public channels for accessing market data like prices and order book updates, as well as private (authenticated) 
+channels for personal fund and order change notifications. 
+This service ensures quick access to trading information, secure authentication, efficient order management, 
+and an enhanced user experience, catering to the needs of both public and private traders.
+The service is available on [wss://www.alp.com/alp-ws](wss://www.alp.com/alp-ws).
+
+
+## Ping
+
+1. **Ping Message:** The server initiates the process by sending a "ping" message, string `1` to the client at regular intervals, every 20 seconds by default.
+2. **Pong Message:** Upon receiving the ping message, the client responds with a "pong" message, string `2` to acknowledge that it's still active and responsive.
+3. **Connection Monitoring:** The server keeps track of the time since the last ping message was sent. If it doesn't receive a corresponding pong message within a set timeframe, 30 seconds by default, it interprets this as an unresponsive client.
+4. **Connection Closure:** In the event that the server doesn't receive a pong message within the specified time frame (30 seconds by default), it takes action to close the connection. This action can include terminating the connection to free up server resources and maintain system efficiency.
+
+
+## Topic Subscription
+
+Message to subscribe on topics: 
+`["subscribe", "topic1", "topic2", ...]`
+
+Message to unsubscribe: 
+`["unsubscribe", "topic1", "topic2", ...]`
+
+The server will respond on subscription or unsubscription with next messages
+`["subscribe",1586857703.901509,"topic1","topic1"]`
+`["unsubscribe",1586857703.901509,"topic1","topic1"]`
+
+In case of any error, the server will send next message:
+`["error",1586857703.901509,"Topic does not exist"]`
+
+
+## Welcome
+The welcome message gets sent when a connection is established. This message provides important initialization information for the client to ensure a smooth and responsive communication experience.
+
+Message Fields
+1. **Type (Index 0)**: The type of the message is set to "welcome," indicating that it's a welcome message.
+2. **Time (Index 1)**: A floating-point number representing the timestamp of the message.
+3. **PingInterval (Index 2)**: An integer representing the ping interval in nanoseconds. This specifies how often the client should send ping messages to the server to maintain the connection.
+4. **PingTimeout (Index 3)**: An integer representing the ping timeout in nanoseconds. If the server does not receive a ping response from the client within this timeout period, it may consider the connection as unresponsive and take appropriate action.
+5. **ClientID (Index 4)**: A unique identifier (UUID) for the client, allowing the server to distinguish between different clients.
+
+> Event 
+
+```json
+["welcome", 1694002700, 30000000000, 65000000000, "5c00d9c2-607e-4c7f-927b-b204b29e387b"]
+```
+
+
+## Ticker
+
+Topics: `ticker.*`, `ticker.XXX_YYY`
+
+Message Fields
+1. **Type (Index 0):** The type of the message is set to "tk," indicating that it's a ticker message.
+2. **Timestamp (Index 1):** The Unix timestamp of the ticker data.
+3. **Payload (Index 2):** The payload is an array containing trading pairs and their corresponding ticker information. Each trading pair is represented as an array with the following fields:
+- Trading Pair Symbol
+- Close Price
+- Base Volume
+- Quote Volume
+- Change Percent
+- High Price
+- Low Price
+- Bid Price
+- Ask Price
+
+> Example
+
+```json
+[
+  "tk",
+  1694003337,
+  [
+    ["XRP_USDT", "0.50057000", "2036106.67737645", "1024194.48541761", "-0.28287417", "0.50677000", "0.49872000", "0.50057000", "0.50117000"],
+    ["BTC_USDT", "25725.53000000", "6074.90520117", "156489295.23543299", "0.09369121", "25889.00000000", "25629.43000000", "25717.69000000", "25747.69000000"],
+    ["LTC_USDT", "63.06000000", "19800.19751964", "1248404.62483421", "0.39802579", "63.63000000", "62.60000000", "63.03000000", "63.06000000"],
+    ["DOGE_USDT", "0.06389400", "26360317.66603325", "1686644.45381961", "0.03131164", "0.06466200", "0.06354300", "0.06384708", "0.06396200"],
+    ["ETH_USDT", "1632.69000000", "7379.92830702", "12057736.03072529", "0.10791388", "1648.02000000", "1625.16000000", "1632.69000000", "1635.28000000"],
+    ["TRX_USDT", "0.07827864", "17930244.99331608", "1392304.80058763", "1.44319315", "0.07857449", "0.07710881", "0.07832800", "0.07842434"],
+    ["USDC_USDT", "1.00130000", "2135117.29179469", "2136330.76840695", "0.08996401", "1.00190090", "0.99929970", "1.00160060", "1.00140000"]
+  ]
+]
+```
+
+
+## Trade
+
+Topics: `trade.*`, `trade.XXX_YYY`
+
+Message Fields
+1. **Type (Index 0):** The type of the message is set to "t," indicating that it's a trade event.
+2. **Timestamp (Index 1):** The Unix timestamp of the trade event.
+3. **Trade ID (Index 2):** A unique identifier for the trade event.
+4. **Trading Pair Symbol (Index 3):** The symbol representing the trading pair associated with the trade.
+5. **Trade Amount (Index 4):** The amount of the trade, converted to a string.
+6. **Trade Price (Index 5):** The price of the trade, converted to a string.
+7. **Trade Direction (Index 6):** The direction of the trade, either "buy" or "sell.
+
+> Example
+
+```json
+[
+  "t",
+  1694003848,
+  293107798,
+  "BTC_USDT",
+  "0.20285052",
+  "25705.02000000",
+  "buy"
+]
+```
+
+
+## Rates
+
+Topics: `rates.*`, `rates.XXX_YYY`
+
+Message Fields
+1. **Type (Index 0):** The type of the message is set to "r," indicating that it's a rates event.
+2. **Date (Index 1):** The Unix timestamp of the trade event.
+3. **Payload (Index 3)** The payload is an array containing rate information. Each rate is represented as an array with the following fields:
+- Rate Value
+- Base Currency Code
+- Quote Currency Code
+
+> Example
+
+```json
+[
+  "r",
+  1694004000,
+  [
+    ["1.25000000", "USD", "EUR"],
+    ["0.50000000", "BTC", "ETH"],
+    ["2.00000000", "ETH", "USDT"]
+  ]
+]
+```
+
+## Orderbook Diff
+
+Topics: `diff.XXX_YYY`
+
+Message Fields
+1. **Type (Index 0):** The type of the message is set to "d," indicating that it's a market depth difference event.
+2. **Timestamp (Index 1):** The Unix timestamp of the market depth difference data.
+3. **Payload (Index 2):** The payload is an array containing market depth difference information. It includes the following fields:
+- Symbol: The trading symbol associated with the market depth.
+- Asks: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.
+- Bids: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.
+
+> Example
+
+```json
+[
+  "d",
+  1694004500,
+  "BTC_USDT",
+  [
+    [["101.00", "5.0"], ["102.00", "3.0"]],
+    [["99.00", "2.0"], ["98.50", "1.0"]]
+  ]
+]
+```
+
+
+## Market Depth
+
+Topics: `market_depth.XXX_YYY`
+
+Message Fields
+1. **Type (Index 0):** The type of the message is set to "p," indicating that it's a market depth event.
+2. **Timestamp (Index 1):** The Unix timestamp of the market depth data.
+3. **Payload (Index 2):** The payload is an array containing market depth information represented by the "depthDTO" structure. It includes the following fields:
+- Asks: A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
+- Bids: A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
+- Symbol: The trading symbol associated with the market depth.
+- TotalAsks: The total quantity of asks.
+- TotalBids: The total quantity of bids.
+
+> Example
+
+```json
+[
+  "p",
+  1694004300,
+  [
+    [["100.00", "10.0"], ["101.00", "15.0"]],
+    [["99.00", "8.0"], ["98.50", "5.0"]],
+    "BTC_USDT",
+    "25.0",
+    "13.0"
+  ]
+]
+```
+
+## Auth
+
+Will be available soon
+
+
+## Account Order Update
+
+Will be available soon
+
+
+## Account Wallet Update
+
+Will be available soon
