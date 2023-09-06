@@ -175,7 +175,7 @@
 <li><code>EXPIRED</code>: Expired Order</li>
 <li><code>FAILED</code>: Failed Order</li>
 </ul>
-<h3 id='time-in-force'>Time in Force</h3>
+<h3 id='order-time-in-force'>Order Time in Force</h3>
 <ul>
 <li><code>GOOD_TILL_CANCEL</code>: Good &#39;til Cancelled</li>
 <li><code>IMMEDIATE_OR_CANCEL</code>: Immediate or Cancel</li>
@@ -183,18 +183,18 @@
 <li><code>FILL_OR_KILL</code>: Fill or Kill</li>
 <li><code>UNDEFINED_TIME_IN_FORCE</code>: Undefined Time in Force</li>
 </ul>
-<h3 id='side-effects'>Side Effects</h3>
+<h3 id='order-side-effects'>Order Side Effects</h3>
 <ul>
 <li><code>NO_SIDE_EFFECT</code>: No Side Effect</li>
 <li><code>AUTO_BORROW</code>: Auto Borrow</li>
 <li><code>AUTO_REPLAY</code>: Auto Replay</li>
 </ul>
-<h3 id='stop-operators'>Stop Operators</h3>
+<h3 id='order-stop-operators'>Order Stop Operators</h3>
 <ul>
 <li><code>GTE</code>: Greater Than or Equal To</li>
 <li><code>LTE</code>: Less Than or Equal To</li>
 </ul>
-<h3 id='loan-types'>Loan Types</h3>
+<h3 id='margin-loan-types'>Margin Loan Types</h3>
 <ul>
 <li><code>AUTO</code>: Auto Loan Type</li>
 <li><code>MANUAL</code>: Manual Loan Type</li>
@@ -1150,7 +1150,17 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
     </span><span class="nl">"order_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LIMIT"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"tif"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GTC"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre></div>
+</span></code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">from</span> <span class="nn">alpcom_api</span> <span class="kn">import</span> <span class="n">dto</span>
+
+<span class="n">req_limit</span> <span class="o">=</span> <span class="n">dto</span><span class="p">.</span><span class="n">LimitOrderRequest</span><span class="p">(</span>
+    <span class="n">pair</span><span class="o">=</span><span class="s">'ETH_USDT'</span><span class="p">,</span>
+    <span class="n">order_side</span><span class="o">=</span><span class="n">dto</span><span class="p">.</span><span class="n">OrderSide</span><span class="p">.</span><span class="n">SELL</span><span class="p">,</span>
+    <span class="n">base_amount</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">limit_price</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">private_api</span><span class="p">.</span><span class="n">trading</span><span class="p">().</span><span class="n">place_order</span><span class="p">(</span><span class="n">req_limit</span><span class="p">)</span>
+</code></pre></div>
 <blockquote>
 <p>Market Order Request</p>
 </blockquote>
@@ -1166,7 +1176,16 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
     </span><span class="nl">"quote_amount"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
     </span><span class="nl">"order_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MARKET"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre></div>
+</span></code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">from</span> <span class="nn">alpcom_api</span> <span class="kn">import</span> <span class="n">dto</span>
+
+<span class="n">req_market</span> <span class="o">=</span> <span class="n">dto</span><span class="p">.</span><span class="n">MarketOrderRequest</span><span class="p">(</span>
+    <span class="n">pair</span><span class="o">=</span><span class="s">'ETH_USDT'</span><span class="p">,</span>
+    <span class="n">order_side</span><span class="o">=</span><span class="n">dto</span><span class="p">.</span><span class="n">OrderSide</span><span class="p">.</span><span class="n">SELL</span><span class="p">,</span>
+    <span class="n">base_amount</span><span class="o">=</span><span class="mf">0.1</span> <span class="c1"># base_amount or quote_amount
+</span><span class="p">)</span>
+
+<span class="n">private_api</span><span class="p">.</span><span class="n">trading</span><span class="p">().</span><span class="n">place_order</span><span class="p">(</span><span class="n">req_market</span><span class="p">)</span>
+</code></pre></div>
 <blockquote>
 <p>Stop Limit Order Request</p>
 </blockquote>
@@ -1187,14 +1206,16 @@ Calculate this signature as the HMAC SHA-256 hash of the request body using the 
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">from</span> <span class="nn">alpcom_api</span> <span class="kn">import</span> <span class="n">dto</span>
 
-<span class="n">req_limit</span> <span class="o">=</span> <span class="n">dto</span><span class="p">.</span><span class="n">LimitOrderRequest</span><span class="p">(</span>
+<span class="n">req_stop_limit</span> <span class="o">=</span> <span class="n">dto</span><span class="p">.</span><span class="n">StopLimitOrderRequest</span><span class="p">(</span>
     <span class="n">pair</span><span class="o">=</span><span class="s">'ETH_USDT'</span><span class="p">,</span>
     <span class="n">order_side</span><span class="o">=</span><span class="n">dto</span><span class="p">.</span><span class="n">OrderSide</span><span class="p">.</span><span class="n">SELL</span><span class="p">,</span>
+    <span class="n">stop_price</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+    <span class="n">stop_operator</span><span class="o">=</span><span class="n">dto</span><span class="p">.</span><span class="n">StopOperator</span><span class="p">.</span><span class="n">GTE</span><span class="p">,</span>
     <span class="n">base_amount</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
-    <span class="n">limit_price</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+    <span class="n">limit_price</span><span class="o">=</span><span class="mi">1700</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">private_api</span><span class="p">.</span><span class="n">trading</span><span class="p">().</span><span class="n">place_order</span><span class="p">(</span><span class="n">req_limit</span><span class="p">)</span>
+<span class="n">private_api</span><span class="p">.</span><span class="n">trading</span><span class="p">().</span><span class="n">place_order</span><span class="p">(</span><span class="n">req_stop_limit</span><span class="p">)</span>
 </code></pre></div>
 <blockquote>
 <p>Response, (Array of created order ids)</p>
@@ -1883,6 +1904,183 @@ This method is disabled by default, set &quot;Margin&quot; flag during creation 
 <p><code>start_time</code> and <code>end_time</code> interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
 This method is disabled by default, set &quot;Margin&quot; flag during creation of an API-Key to use it.</p>
 </blockquote>
+<h1 id='websocket-api'><em>WebSocket API</em></h1>
+<p>The WebSocket service by Alp Exchange is a real-time communication platform for traders. 
+It offers public channels for accessing market data like prices and order book updates, as well as private (authenticated) 
+channels for personal fund and order change notifications. 
+This service ensures quick access to trading information, secure authentication, efficient order management, 
+and an enhanced user experience, catering to the needs of both public and private traders.
+The service is available on <a href="wss://www.alp.com/alp-ws">wss://www.alp.com/alp-ws</a>.</p>
+<h2 id='ping'>Ping</h2>
+<ol>
+<li><strong>Ping Message:</strong> The server initiates the process by sending a &quot;ping&quot; message, string <code>1</code> to the client at regular intervals, every 20 seconds by default.</li>
+<li><strong>Pong Message:</strong> Upon receiving the ping message, the client responds with a &quot;pong&quot; message, string <code>2</code> to acknowledge that it&#39;s still active and responsive.</li>
+<li><strong>Connection Monitoring:</strong> The server keeps track of the time since the last ping message was sent. If it doesn&#39;t receive a corresponding pong message within a set timeframe, 30 seconds by default, it interprets this as an unresponsive client.</li>
+<li><strong>Connection Closure:</strong> In the event that the server doesn&#39;t receive a pong message within the specified time frame (30 seconds by default), it takes action to close the connection. This action can include terminating the connection to free up server resources and maintain system efficiency.</li>
+</ol>
+<h2 id='topic-subscription'>Topic Subscription</h2>
+<p>Message to subscribe on topics: 
+<code>[&quot;subscribe&quot;, &quot;topic1&quot;, &quot;topic2&quot;, ...]</code></p>
+
+<p>Message to unsubscribe: 
+<code>[&quot;unsubscribe&quot;, &quot;topic1&quot;, &quot;topic2&quot;, ...]</code></p>
+
+<p>The server will respond on subscription or unsubscription with next messages
+<code>[&quot;subscribe&quot;,1586857703.901509,&quot;topic1&quot;,&quot;topic1&quot;]</code>
+<code>[&quot;unsubscribe&quot;,1586857703.901509,&quot;topic1&quot;,&quot;topic1&quot;]</code></p>
+
+<p>In case of any error, the server will send next message:
+<code>[&quot;error&quot;,1586857703.901509,&quot;Topic does not exist&quot;]</code></p>
+<h2 id='welcome'>Welcome</h2>
+<p>The welcome message gets sent when a connection is established. This message provides important initialization information for the client to ensure a smooth and responsive communication experience.</p>
+
+<p>Message Fields
+1. <strong>Type (Index 0)</strong>: The type of the message is set to &quot;welcome,&quot; indicating that it&#39;s a welcome message.
+2. <strong>Time (Index 1)</strong>: A floating-point number representing the timestamp of the message.
+3. <strong>PingInterval (Index 2)</strong>: An integer representing the ping interval in nanoseconds. This specifies how often the client should send ping messages to the server to maintain the connection.
+4. <strong>PingTimeout (Index 3)</strong>: An integer representing the ping timeout in nanoseconds. If the server does not receive a ping response from the client within this timeout period, it may consider the connection as unresponsive and take appropriate action.
+5. <strong>ClientID (Index 4)</strong>: A unique identifier (UUID) for the client, allowing the server to distinguish between different clients.</p>
+
+<blockquote>
+<p>Event </p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="s2">"welcome"</span><span class="p">,</span><span class="w"> </span><span class="mi">1694002700</span><span class="p">,</span><span class="w"> </span><span class="mi">30000000000</span><span class="p">,</span><span class="w"> </span><span class="mi">65000000000</span><span class="p">,</span><span class="w"> </span><span class="s2">"5c00d9c2-607e-4c7f-927b-b204b29e387b"</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='ticker'>Ticker</h2>
+<p>Topics: <code>ticker.*</code>, <code>ticker.XXX_YYY</code></p>
+
+<p>Message Fields
+1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;tk,&quot; indicating that it&#39;s a ticker message.
+2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the ticker data.
+3. <strong>Payload (Index 2):</strong> The payload is an array containing trading pairs and their corresponding ticker information. Each trading pair is represented as an array with the following fields:
+- Trading Pair Symbol
+- Close Price
+- Base Volume
+- Quote Volume
+- Change Percent
+- High Price
+- Low Price
+- Bid Price
+- Ask Price</p>
+
+<blockquote>
+<p>Example</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
+  </span><span class="s2">"tk"</span><span class="p">,</span><span class="w">
+  </span><span class="mi">1694003337</span><span class="p">,</span><span class="w">
+  </span><span class="p">[</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"XRP_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.50057000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2036106.67737645"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1024194.48541761"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-0.28287417"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.50677000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.49872000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.50057000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.50117000"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"BTC_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"25725.53000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"6074.90520117"</span><span class="p">,</span><span class="w"> </span><span class="s2">"156489295.23543299"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.09369121"</span><span class="p">,</span><span class="w"> </span><span class="s2">"25889.00000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"25629.43000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"25717.69000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"25747.69000000"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"LTC_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"63.06000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"19800.19751964"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1248404.62483421"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.39802579"</span><span class="p">,</span><span class="w"> </span><span class="s2">"63.63000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"62.60000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"63.03000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"63.06000000"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"DOGE_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.06389400"</span><span class="p">,</span><span class="w"> </span><span class="s2">"26360317.66603325"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1686644.45381961"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.03131164"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.06466200"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.06354300"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.06384708"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.06396200"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"ETH_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1632.69000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"7379.92830702"</span><span class="p">,</span><span class="w"> </span><span class="s2">"12057736.03072529"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.10791388"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1648.02000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1625.16000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1632.69000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1635.28000000"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"TRX_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.07827864"</span><span class="p">,</span><span class="w"> </span><span class="s2">"17930244.99331608"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1392304.80058763"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1.44319315"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.07857449"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.07710881"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.07832800"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.07842434"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"USDC_USDT"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1.00130000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2135117.29179469"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2136330.76840695"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.08996401"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1.00190090"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.99929970"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1.00160060"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1.00140000"</span><span class="p">]</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='trade'>Trade</h2>
+<p>Topics: <code>trade.*</code>, <code>trade.XXX_YYY</code></p>
+
+<p>Message Fields
+1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;t,&quot; indicating that it&#39;s a trade event.
+2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the trade event.
+3. <strong>Trade ID (Index 2):</strong> A unique identifier for the trade event.
+4. <strong>Trading Pair Symbol (Index 3):</strong> The symbol representing the trading pair associated with the trade.
+5. <strong>Trade Amount (Index 4):</strong> The amount of the trade, converted to a string.
+6. <strong>Trade Price (Index 5):</strong> The price of the trade, converted to a string.
+7. <strong>Trade Direction (Index 6):</strong> The direction of the trade, either &quot;buy&quot; or &quot;sell.</p>
+
+<blockquote>
+<p>Example</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
+  </span><span class="s2">"t"</span><span class="p">,</span><span class="w">
+  </span><span class="mi">1694003848</span><span class="p">,</span><span class="w">
+  </span><span class="mi">293107798</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"BTC_USDT"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"0.20285052"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"25705.02000000"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"buy"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='rates'>Rates</h2>
+<p>Topics: <code>rates.*</code>, <code>rates.XXX_YYY</code></p>
+
+<p>Message Fields
+1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;r,&quot; indicating that it&#39;s a rates event.
+2. <strong>Date (Index 1):</strong> The Unix timestamp of the trade event.
+3. <strong>Payload (Index 3)</strong> The payload is an array containing rate information. Each rate is represented as an array with the following fields:
+- Rate Value
+- Base Currency Code
+- Quote Currency Code</p>
+
+<blockquote>
+<p>Example</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
+  </span><span class="s2">"r"</span><span class="p">,</span><span class="w">
+  </span><span class="mi">1694004000</span><span class="p">,</span><span class="w">
+  </span><span class="p">[</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"1.25000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"USD"</span><span class="p">,</span><span class="w"> </span><span class="s2">"EUR"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"0.50000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ETH"</span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="s2">"2.00000000"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ETH"</span><span class="p">,</span><span class="w"> </span><span class="s2">"USDT"</span><span class="p">]</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='orderbook-diff'>Orderbook Diff</h2>
+<p>Topics: <code>diff.XXX_YYY</code></p>
+
+<p>Message Fields
+1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;d,&quot; indicating that it&#39;s a market depth difference event.
+2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the market depth difference data.
+3. <strong>Payload (Index 2):</strong> The payload is an array containing market depth difference information. It includes the following fields:
+- Symbol: The trading symbol associated with the market depth.
+- Asks: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.
+- Bids: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.</p>
+
+<blockquote>
+<p>Example</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
+  </span><span class="s2">"d"</span><span class="p">,</span><span class="w">
+  </span><span class="mi">1694004500</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"BTC_USDT"</span><span class="p">,</span><span class="w">
+  </span><span class="p">[</span><span class="w">
+    </span><span class="p">[[</span><span class="s2">"101.00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"5.0"</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">"102.00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"3.0"</span><span class="p">]],</span><span class="w">
+    </span><span class="p">[[</span><span class="s2">"99.00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">"98.50"</span><span class="p">,</span><span class="w"> </span><span class="s2">"1.0"</span><span class="p">]]</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='market-depth'>Market Depth</h2>
+<p>Topics: <code>market_depth.XXX_YYY</code></p>
+
+<p>Message Fields
+1. <strong>Type (Index 0):</strong> The type of the message is set to &quot;p,&quot; indicating that it&#39;s a market depth event.
+2. <strong>Timestamp (Index 1):</strong> The Unix timestamp of the market depth data.
+3. <strong>Payload (Index 2):</strong> The payload is an array containing market depth information represented by the &quot;depthDTO&quot; structure. It includes the following fields:
+- Asks: A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
+- Bids: A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
+- Symbol: The trading symbol associated with the market depth.
+- TotalAsks: The total quantity of asks.
+- TotalBids: The total quantity of bids.</p>
+
+<blockquote>
+<p>Example</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
+  </span><span class="s2">"p"</span><span class="p">,</span><span class="w">
+  </span><span class="mi">1694004300</span><span class="p">,</span><span class="w">
+  </span><span class="p">[</span><span class="w">
+    </span><span class="p">[[</span><span class="s2">"100.00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"10.0"</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">"101.00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"15.0"</span><span class="p">]],</span><span class="w">
+    </span><span class="p">[[</span><span class="s2">"99.00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"8.0"</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">"98.50"</span><span class="p">,</span><span class="w"> </span><span class="s2">"5.0"</span><span class="p">]],</span><span class="w">
+    </span><span class="s2">"BTC_USDT"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"25.0"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"13.0"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div><h2 id='auth'>Auth</h2>
+<p>Will be available soon</p>
+<h2 id='account-order-update'>Account Order Update</h2>
+<p>Will be available soon</p>
+<h2 id='account-wallet-update'>Account Wallet Update</h2>
+<p>Will be available soon</p>
 
           <h1 id='http-errors'>HTTP Errors</h1>
 <p>HTTP API uses following error statuses:</p>
