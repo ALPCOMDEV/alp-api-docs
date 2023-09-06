@@ -2,6 +2,7 @@
 title: ALP.COM API Reference
 
 language_tabs:
+  - json: JSON
   - python: Python
 
 toc_footers:
@@ -138,6 +139,10 @@ private_api = factories.get_private_api(
 
 `GET /api/v3/currencies`
 
+```python
+public_api.currencies()
+```
+
 > Response
 
 ```json
@@ -159,6 +164,10 @@ Parameter | Type    | Description
 --------- |---------| -----------
 currency1 | string  | filter by base currency
 currency2 | integer | filter by quote currency
+
+```python
+public_api.pairs()
+```
 
 > Response
 
@@ -185,6 +194,10 @@ Parameter | Type    | Description
 --------- |---------| -----------
 pair | string  | pair symbol like `BTC_USDT`
 pair_id | integer | id of pair
+
+```python
+public_api.ticker()
+```
 
 > Response
 
@@ -214,6 +227,10 @@ pair | string  | pair symbol like `BTC_USDT`
 group | integer | if set `1` - orders will be grouped by price
 limit_buy | integer  | limit of buy orders
 limit_sell | integer  | limit of sell orders
+
+```python
+public_api.orderbook('BTC_USDT')
+```
 
 > Response
 
@@ -256,6 +273,17 @@ since | integer | timestamp, filter from
 until | integer | timestamp, filter to 
 limit | integer | timestamp, limit of candles
 
+```python
+import time
+from alpcom_api import dto
+
+candle_list = public_api.charts(
+    pair='BTC_USDT',
+    interval=dto.ChartInterval.DAY,
+    since=int(time.time()) - 60 * 60 * 24 * 10  # last 10 days
+)
+```
+
 > Response
 
 ```json
@@ -280,6 +308,10 @@ Parameter | Type    | Description
 pair | string  | pair symbol like `BTC_USDT`
 limit | integer | limit of records
 offset | integer | offset of records
+
+```python
+last_trades = public_api.trades(pair='BTC_USDT', limit=10)
+```
 
 > Response
 
@@ -332,6 +364,10 @@ Parameter | Type    | Description
 --------- |---------| -----------
 include_subaccounts | bool | if set true, all subaccounts for account are returned as well
 
+```python
+private_api.accounts().accounts(include_subaccounts=True)
+```
+
 > Response
 
 ```json
@@ -350,6 +386,10 @@ where:
 ## Account Balances
 
 `GET /api/v3/accounts/balances`
+
+```python
+private_api.accounts().balances()
+```
 
 > Response
 
@@ -371,6 +411,10 @@ where:
 ## Fee Info
 
 `GET /api/v3/accounts/feeinfo`
+
+```python
+private_api.accounts().fees()
+```
 
 > Response
 
@@ -402,9 +446,9 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
 | end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+```python
+private_api.accounts().orders('ETH_USDT', open_only=True)
+```
 
 > Response
 
@@ -431,6 +475,12 @@ Query Parameters
 } ...]
 ```
 
+
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+
 ## Account Trades
 
 `GET /api/v3/accounts/trades`
@@ -445,9 +495,9 @@ side | string  | if set must be rather `BUY` or `SELL`
 start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`
 end_time | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+```python
+private_api.accounts().trades('ETH_USDT')
+```
 
 > Response
 
@@ -470,6 +520,11 @@ end_time | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`
 }, ...]
 ```
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+
 
 ## Operation History
 
@@ -483,9 +538,9 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
 | end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+```python
+private_api.accounts().history('USDT')
+```
 
 > Response
 
@@ -508,6 +563,12 @@ Query Parameters
 ```
 
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+
+
+
 ## Deposit Methods
 
 `GET /api/v3/deposit/methods`
@@ -517,6 +578,10 @@ Query Parameters
 | Parameter | Type    | Description                            |
 |-----------|---------|----------------------------------------|
 | currency  | string  | currency symbol like `BTC` (required!) |
+
+```python
+private_api.deposits().methods(currency='USDT')
+```
 
 > Response
 
@@ -553,6 +618,11 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
 | end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
 
+
+```python
+private_api.deposits().history(currency='USDT')
+```
+
 > Response
 
 ```json
@@ -572,10 +642,14 @@ Query Parameters
 
 Query Parameters
 
-| Parameter | Type    | Description                            |
-|-----------|---------|----------------------------------------|
-| currency  | string  | currency symbol like `BTC` (required!) |
+| Parameter | Type    | Description                 | Required   |
+|-----------|---------|-----------------------------|------------|
+| currency  | string  | currency symbol like `BTC`  | true       |
 
+
+```python
+private_api.withdraws().methods(currency='USDT')
+```
 
 > Response
 
@@ -613,6 +687,32 @@ Query Parameters
 
 `POST /api/v3/withdraw`
 
+Body Parameters
+
+| Parameter        | Type    | Description                                             | Required |
+|------------------|---------|---------------------------------------------------------|----------|
+| amount           | number  | The amount, e.g., 50.0                                  | true     |
+| method           | number  | The method identifier, e.g., 123                        | true     |
+| attributes       | object  | Attributes for payment: address, memo, credit card, etc | true     |
+| client_order_id  | string  | Client order ID, e.g., "withdraw-1"                     | false    |
+
+
+
+```python
+from alpcom_api import dto
+
+req = dto.WithdrawRequest(
+    amount=10.0,
+    method=2,
+    attributes={
+        'address': '<my_dest_addr>',
+        'memo': '<extra memo>'
+    },
+    client_order_id='order_123'
+)
+private_api.withdraws().create(req)
+```
+
 > Query Body
 
 ```json
@@ -644,6 +744,10 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00`|
 | end_time  | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`|
 
+```python
+private_api.withdraws().history(currency='USDT')
+```
+
 > Response
 
 ```json
@@ -669,6 +773,26 @@ Query Parameters
 
 `POST /api/v3/trading/order`
 
+Body Parameters
+
+| Attribute       | Type     | Limit    | Stop Limit | Market   | Description                                      |
+|-----------------|----------|----------|------------|----------|--------------------------------------------------|
+| pair            | string   | required | required   | required | The trading pair.                                |
+| order_type      | string   | required | required   | required | MARKET, LIMIT, STOP_LIMIT, or STOP_MARKET.       |
+| order_side      | string   | required | required   | required | BID or ASC.                                      |
+| wallet_type     | string   | required | required   | required | SPOT, CROSS_MARGIN, ISOLATED_MARGIN, or FUNDING. |
+| client_order_id | string   | required | required   | required | The client order ID.                             |
+| side_effect     | string   | required | required   | required | NO_SIDE_EFFECT, AUTO_BORROW, AUTO_REPLAY         |
+| expire_after    | datetime | required | required   | required | The expiration date and time.                    |
+| base_amount     | float    | required | required   | optional | The base amount of the order.                    |
+| quote_amount    | float    |          |            | optional | The quote amount of the order.                   |
+| limit_price     | float    | required | required   |          | The limit price for a order.                     |
+| stop_price      | float    |          | required   |          | The stop price, required for STOP_LIMIT.         |
+| stop_operator   | string   |          | required   |          | GTE, LTE, required for STOP_LIMIT.               |
+| valid_till      | optional | optional | optional   | optional | The valid till date and time.                    |
+| tif             | optional | optional | optional   | optional | GTC, IOC, AON, FOK                               |
+
+
 
 > Limit Order Request
 
@@ -689,6 +813,7 @@ Query Parameters
 ```
 
 > Market Order Request
+
 ```json
 {
     "pair": "BTC/USD",
@@ -705,6 +830,7 @@ Query Parameters
 ```
 
 > Stop Limit Order Request
+
 ```json
 {
     "pair": "BTC/USD",
@@ -723,7 +849,21 @@ Query Parameters
 }
 ```
 
+```python
+from alpcom_api import dto
+
+req_limit = dto.LimitOrderRequest(
+    pair='ETH_USDT',
+    order_side=dto.OrderSide.SELL,
+    base_amount=0.05,
+    limit_price=1800,
+)
+
+private_api.trading().place_order(req_limit)
+```
+
 > Response, (Array of created order ids)
+
 ```json
 [34]
 ```
@@ -732,6 +872,15 @@ Query Parameters
 ## Cancel Order
 
 `DELETE /api/v3/trading/order`
+
+Body Parameters
+
+| Parameter | Type    | Description                                                 |
+|-----------|---------|-------------------------------------------------------------|
+| order_ids | array   | An array of order IDs, e.g., [1, 5, 8]                      |
+| all       | boolean | rather `order_ids` or `all`=`true` must be specified        |
+| pair      | string  | can be specified to cancel all orders for one specific pair |
+
 
 > Query Body
 
@@ -742,16 +891,47 @@ Query Parameters
   "pair": ""
 }
 ```
-> **Note**
->
-> rather `order_ids` or `all`=`true` must be specified. If `all`=`true`, `pair` can be specified to cancel all orders for one specific pair
+
+```python
+private_api.trading().cancel_order(12312332)
+private_api.trading().cancel_orders([12312332, 12312334, 12312338])
+private_api.trading().cancel_orders_of_pair('ETH_USDT')
+```
 
 
 ## Margin Transfer
 
 `POST /api/v3/margin/transfer`
 
+Body Parameters
+
+| Parameter   | Type    | Description                       | Required |
+|-------------|---------|-----------------------------------|----------|
+| account_id  | integer | The account ID, e.g., 12345       | true     |
+| wallet_type | string  | The wallet type, e.g., "SPOT"     | true     |
+| direction   | string  | "ADD" or "SUB"                    | true     |
+| amount      | number  | The amount, e.g., 100.0           | true     |
+| currency    | string  | The currency symbol, e.g., "USDT" | true     |
+| pair        | null    | The trading pair, e.g., null      | false    |
+| note        | null    | A note, e.g., null                | false    |
+
+
+```python
+from alpcom_api import dto
+
+req = dto.MarginTransferRequest(
+    account_id=384457,
+    wallet_type=dto.WalletType.MARGIN_CROSS,
+    direction=dto.MarginDirection.ADD,
+    amount=1,
+    currency='ETH',
+)
+
+operation_id = private_api.margin().transfer(req)
+```
+
 > Query Body
+
 ```json
 {
     "account_id": 12345,
@@ -765,6 +945,7 @@ Query Parameters
 ```
 
 > Response:
+
 ```text
 123 # transfer id
 ```
@@ -777,6 +958,32 @@ Query Parameters
 ## Margin Borrow
 
 `POST /api/v3/margin/borrow`
+
+Body Parameters
+
+| Parameter   | Type    | Description                           | Required |
+|-------------|---------|---------------------------------------|----------|
+| account_id  | integer | The account ID, e.g., 12345           | true     |
+| borrow      | number  | The amount to borrow, e.g., 100.0     | true     |
+| currency    | string  | The currency symbol, e.g., "USD"      | true     |
+| wallet_type | string  | The wallet type, e.g., "SPOT"         | true     |
+| pair        | null    | The trading pair, e.g., null          | false    |
+| type        | string  | The type of loan, e.g., "LOAN_MANUAL" | true     |
+
+
+```python
+from alpcom_api import dto
+
+req = dto.BorrowRequest(
+    account_id=384457,
+    borrow=1,
+    currency='ETH',
+    wallet_type=dto.WalletType.MARGIN_CROSS,
+)
+
+operation_id = private_api.margin().borrow(req)
+```
+
 
 > Query Body
 
@@ -805,6 +1012,32 @@ Query Parameters
 
 `POST /api/v3/margin/repay`
 
+Body Parameters
+
+| Parameter   | Type    | Description                           | Required |
+|-------------|---------|---------------------------------------|----------|
+| account_id  | integer | The account ID, e.g., 12345           | true     |
+| borrow      | number  | The amount to borrow, e.g., 100.0     | true     |
+| currency    | string  | The currency symbol, e.g., "USD"      | true     |
+| wallet_type | string  | The wallet type, e.g., "SPOT"         | true     |
+| pair        | null    | The trading pair, e.g., null          | false    |
+| type        | string  | The type of loan, e.g., "LOAN_MANUAL" | true     |
+
+
+```python
+from alpcom_api import dto
+
+req = dto.RepayRequest(
+    account_id=384457,
+    amount=0.03,
+    currency='ETH',
+    wallet_type=dto.WalletType.MARGIN_CROSS,
+)
+
+operation_id = private_api.margin().repay(req)
+```
+
+
 > Query Body
 
 ```json
@@ -830,7 +1063,19 @@ Query Parameters
 
 ### Close Position
 
+Body Parameters
+
+| Parameter   | Type   | Description                              | Required |
+|-------------|--------|------------------------------------------|----------|
+| wallet_type | string | The wallet type, e.g., "ISOLATED_MARGIN" | true     |
+| pair        | string | The trading pair, e.g., "BTC_USDT"       | false    |
+
+
 `DELETE /api/v3/margin`
+
+```python
+private_api.margin().close_position(account_id=384457, wallet_type=dto.WalletType.MARGIN_CROSS)
+```
 
 > Query Body
 
@@ -859,10 +1104,11 @@ Query Parameters
 | isolated_margin | bool |  if set true isolated margin positions are returned |
 | cross_margin   | bool |  if set true cross margin positions are returned |
 
-> **Note**
->
-> rather `isolated_margin` or `cross_margin` must be set true
-> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+```python
+loans = private_api.margin().loans(cross_margin=True)
+```
+
 
 > Response
 
@@ -876,6 +1122,12 @@ Query Parameters
     "wallet_type": "SPOT"
 }, ...]
 ```
+
+
+> **Note**
+>
+> rather `isolated_margin` or `cross_margin` must be set true
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
 
 
 
@@ -893,10 +1145,11 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
 | end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
-> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+```python
+private_api.margin().transfers('ETH', start_time=None, end_time=None)
+```
+
 
 > Response
 
@@ -915,6 +1168,13 @@ Query Parameters
 ```
 
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+
+
 ## Margin Borrow History
 
 `GET /api/v3/margin/borrow`
@@ -929,10 +1189,11 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
 | end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
-> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+```python
+private_api.margin().borrows('ETH', start_time=None, end_time=None)
+```
+
 
 > Response
 
@@ -954,6 +1215,12 @@ Query Parameters
 ```
 
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+
 
 ## Margin Repay History
 
@@ -968,10 +1235,10 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
 | end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
-> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+```python
+private_api.margin().repays('ETH', start_time=None, end_time=None)
+```
+
 
 > Response
 
@@ -990,6 +1257,13 @@ Query Parameters
 ```
 
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+
+
 ## Margin Interest History
 
 `GET /api/v3/margin/interest`
@@ -1003,10 +1277,11 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
 | end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
-> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+```python
+private_api.margin().interests('ETH', start_time=None, end_time=None)
+```
+
 
 > Response
 
@@ -1024,6 +1299,12 @@ Query Parameters
 ```
 
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+
 
 ## Margin Liquidation History
 
@@ -1039,10 +1320,11 @@ Query Parameters
 | start_time | string  | start time filter (>=), format: `2006-01-02T15:04:05Z07:00` |
 | end_time   | string  | start time filter (<), format: `2006-01-02T15:04:05Z07:00`  |
 
-> **Note**
->
-> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
-> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
+
+```python
+private_api.margin().liquidations('ETH', start_time=None, end_time=None)
+```
+
 
 > Response
 
@@ -1064,3 +1346,7 @@ Query Parameters
 }...]
 ```
 
+> **Note**
+>
+> `start_time` and `end_time` interval must not exceed 30 days. If one is not set 30 days interval from set value is applied. If both are not set, default time interval is 30 days back from today.
+> This method is disabled by default, set "Margin" flag during creation of an API-Key to use it.
