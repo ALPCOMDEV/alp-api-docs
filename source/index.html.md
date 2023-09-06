@@ -1434,19 +1434,24 @@ Message Fields
 
 Topics: `ticker.*`, `ticker.XXX_YYY`
 
-Message Fields
-1. **Type (Index 0):** The type of the message is set to "tk," indicating that it's a ticker message.
-2. **Timestamp (Index 1):** The Unix timestamp of the ticker data.
-3. **Payload (Index 2):** The payload is an array containing trading pairs and their corresponding ticker information. Each trading pair is represented as an array with the following fields:
-- Trading Pair Symbol
-- Close Price
-- Base Volume
-- Quote Volume
-- Change Percent
-- High Price
-- Low Price
-- Bid Price
-- Ask Price
+Fields:
+
+ - `Type`: The type of the message is set to "tk," indicating that it's a ticker message.
+ - `Timestamp`: The Unix timestamp of the ticker data.
+ - `Payload`. The payload is an array containing trading pairs and their corresponding ticker information. 
+
+
+Each trading pair is represented as an array with the following fields:
+
+ - Trading Pair Symbol
+ - Close Price
+ - Base Volume
+ - Quote Volume
+ - Change Percent
+ - High Price
+ - Low Price
+ - Bid Price
+ - Ask Price
 
 > Example
 
@@ -1471,14 +1476,15 @@ Message Fields
 
 Topics: `trade.*`, `trade.XXX_YYY`
 
-Message Fields
-1. **Type (Index 0):** The type of the message is set to "t," indicating that it's a trade event.
-2. **Timestamp (Index 1):** The Unix timestamp of the trade event.
-3. **Trade ID (Index 2):** A unique identifier for the trade event.
-4. **Trading Pair Symbol (Index 3):** The symbol representing the trading pair associated with the trade.
-5. **Trade Amount (Index 4):** The amount of the trade, converted to a string.
-6. **Trade Price (Index 5):** The price of the trade, converted to a string.
-7. **Trade Direction (Index 6):** The direction of the trade, either "buy" or "sell.
+Fields:
+
+ - `Type`: The type of the message is set to "t," indicating that it's a trade event.
+ - `Timestamp`: The Unix timestamp of the trade event.
+ - `Trade ID`: A unique identifier for the trade event.
+ - `Trading Pair Symbol`: The symbol representing the trading pair associated with the trade.
+ - `Trade Amount`: The amount of the trade, converted to a string.
+ - `Trade Price`: The price of the trade, converted to a string.
+ - `Trade Direction`: The direction of the trade, either "buy" or "sell.
 
 > Example
 
@@ -1499,13 +1505,18 @@ Message Fields
 
 Topics: `rates.*`, `rates.XXX_YYY`
 
-Message Fields
-1. **Type (Index 0):** The type of the message is set to "r," indicating that it's a rates event.
-2. **Date (Index 1):** The Unix timestamp of the trade event.
-3. **Payload (Index 3)** The payload is an array containing rate information. Each rate is represented as an array with the following fields:
-- Rate Value
-- Base Currency Code
-- Quote Currency Code
+Fields:
+
+ - `Type`: The type of the message is set to "r," indicating that it's a rates event.
+ - `Timestamp`: The Unix timestamp of the trade event.
+ - `Payload`: The payload is an array containing rate information. 
+
+
+Each rate is represented as an array with the following fields:
+
+ - Rate Value
+ - Base Currency Code
+ - Quote Currency Code
 
 > Example
 
@@ -1525,13 +1536,14 @@ Message Fields
 
 Topics: `diff.XXX_YYY`
 
-Message Fields
-1. **Type (Index 0):** The type of the message is set to "d," indicating that it's a market depth difference event.
-2. **Timestamp (Index 1):** The Unix timestamp of the market depth difference data.
-3. **Payload (Index 2):** The payload is an array containing market depth difference information. It includes the following fields:
-- Symbol: The trading symbol associated with the market depth.
-- Asks: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.
-- Bids: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.
+Fields:
+
+ - `Type`: The type of the message is set to "d," indicating that it's a market depth difference event.
+ - `Timestamp`: The Unix timestamp of the market depth difference data.
+ - `Payload`: The payload is an array containing market depth difference information. It includes the following fields:
+ - `Symbol`: The trading symbol associated with the market depth.
+ - `Asks`: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.
+ - `Bids`: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.
 
 > Example
 
@@ -1552,15 +1564,19 @@ Message Fields
 
 Topics: `market_depth.XXX_YYY`
 
-Message Fields
-1. **Type (Index 0):** The type of the message is set to "p," indicating that it's a market depth event.
-2. **Timestamp (Index 1):** The Unix timestamp of the market depth data.
-3. **Payload (Index 2):** The payload is an array containing market depth information represented by the "depthDTO" structure. It includes the following fields:
-- Asks: A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
-- Bids: A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
-- Symbol: The trading symbol associated with the market depth.
-- TotalAsks: The total quantity of asks.
-- TotalBids: The total quantity of bids.
+Fields:
+
+ - `Type`: The type of the message is set to "p," indicating that it's a market depth event.
+ - `Timestamp`: The Unix timestamp of the market depth data.
+ - `Payload`: The payload is an array containing market depth information
+
+. It includes the following fields:
+
+ - A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
+ - A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
+ - The trading symbol associated with the market depth.
+ - TotalAsks: The total quantity of asks.
+ - TotalBids: The total quantity of bids.
 
 > Example
 
