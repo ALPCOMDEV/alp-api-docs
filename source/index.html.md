@@ -1698,7 +1698,6 @@ To make it send next message:
 cli = clients.ALPAuthClient(
     key='**API_KEY**',
     secret='**API_KEY**',
-    token_cache=cache.FileCache('dev_token.txt')
 )
 await client.auth(cli)
 ```
@@ -1733,8 +1732,25 @@ Fields:
 
 ```json
 [
-  [12345, "BTC_UST", "ASK", "LIMIT", "0.5", "48000.00", "0.2", "0.3", "0.0", "14400.00", "48000.00", 1631386242.567, "FILLED", "14400.00", "SPOT", "0.00", ""],
-  [12346, "ETH_USD", "BID", "MARKET", "2.0", "0.00", "0.0", "2.0", "0.0", "3000.00", "1500.00", 1631386300.987, "FILLED", "3000.00", "CROSS_MARGIN", "0.00", ""]
+  "o",
+  1694178331,
+  12345, 
+  "BTC_UST", 
+  "ASK", 
+  "LIMIT", 
+  "0.5", 
+  "48000.00", 
+  "0.2", 
+  "0.3", 
+  "0.0", 
+  "14400.00", 
+  "48000.00", 
+  1631386242.567, 
+  "FILLED", 
+  "14400.00", 
+  "SPOT", 
+  "0.00", 
+  ""
 ]
 ```
 
@@ -1744,7 +1760,7 @@ After the authorization, you will receive updates of your balances after each ch
 
 Fields:
 
- - `Type`: The type of the message is set to "o" indicating that it's an order event.
+ - `Type`: The type of the message is set to "w" indicating that it's a wallet update event.
  - `Timestamp`: The Unix timestamp of the message.
  - `Code`: Represents the unique code associated with the item.
  - `Wallet Type`: Indicates the type of wallet  (e.g., 'spot', 'margin').
@@ -1754,7 +1770,12 @@ Fields:
 
 ```json
 [
-  ["USDT", "SPOT", "", "5.0", "1.0"],
-  ["BTC", "SPOT", "", "10.0", "2.0"]
+  "w",
+  1694178331,
+  "USDT", 
+  "SPOT", 
+  "", 
+  "5.0", 
+  "1.0"
 ]
 ```
