@@ -1389,6 +1389,46 @@ and an enhanced user experience, catering to the needs of both public and privat
 The service is available on [wss://www.alp.com/alp-ws](wss://www.alp.com/alp-ws).
 
 
+```python
+import asyncio
+from pprint import pprint
+
+from alpcom_api import ws, clients, cache
+from alpcom_api.dto import ws as dto
+
+
+class MyHandler(ws.Handler):
+    def on_ticker(self, ticker: dto.Ticker):
+        pprint(ticker)
+
+    def on_trade(self, trade: dto.Trade):
+        pprint(trade)
+
+    def on_rate(self, rate: dto.Rate):
+        pprint(rate)
+
+    def on_diff(self, diff: dto.Diff):
+        pprint(diff)
+
+    def on_depth(self, depth: dto.Depth):
+        pprint(depth)
+
+    def on_wallet(self, wallet: dto.Wallet):
+        pprint(wallet)
+
+    def on_order(self, order: dto.Order):
+        pprint(order)
+
+async def main():
+    async with ws.Client(handler=MyHandler()) as client:
+        await client.subscribe(ws.tps.tickers_all)
+        await client.receive_messages()
+
+
+asyncio.get_event_loop().run_until_complete(main())
+```
+
+
 ## Ping
 
 1. **Ping Message:** The server initiates the process by sending a "ping" message, string `1` to the client at regular intervals, every 20 seconds by default.
@@ -1438,10 +1478,12 @@ Fields:
 
  - `Type`: The type of the message is set to "tk," indicating that it's a ticker message.
  - `Timestamp`: The Unix timestamp of the ticker data.
- - `Payload`. The payload is an array containing trading pairs and their corresponding ticker information. 
+ - `Ticker 1`: Ticker array.
+ - `Ticker 2`. Ticker array.
+ - `Ticker n`. Ticker array.
 
 
-Each trading pair is represented as an array with the following fields:
+Each ticker array includes following fields:
 
  - Trading Pair Symbol
  - Close Price
@@ -1459,16 +1501,20 @@ Each trading pair is represented as an array with the following fields:
 [
   "tk",
   1694003337,
-  [
-    ["XRP_USDT", "0.50057000", "2036106.67737645", "1024194.48541761", "-0.28287417", "0.50677000", "0.49872000", "0.50057000", "0.50117000"],
-    ["BTC_USDT", "25725.53000000", "6074.90520117", "156489295.23543299", "0.09369121", "25889.00000000", "25629.43000000", "25717.69000000", "25747.69000000"],
-    ["LTC_USDT", "63.06000000", "19800.19751964", "1248404.62483421", "0.39802579", "63.63000000", "62.60000000", "63.03000000", "63.06000000"],
-    ["DOGE_USDT", "0.06389400", "26360317.66603325", "1686644.45381961", "0.03131164", "0.06466200", "0.06354300", "0.06384708", "0.06396200"],
-    ["ETH_USDT", "1632.69000000", "7379.92830702", "12057736.03072529", "0.10791388", "1648.02000000", "1625.16000000", "1632.69000000", "1635.28000000"],
-    ["TRX_USDT", "0.07827864", "17930244.99331608", "1392304.80058763", "1.44319315", "0.07857449", "0.07710881", "0.07832800", "0.07842434"],
-    ["USDC_USDT", "1.00130000", "2135117.29179469", "2136330.76840695", "0.08996401", "1.00190090", "0.99929970", "1.00160060", "1.00140000"]
-  ]
+  ["XRP_USDT", "0.50057000", "2036106.67737645", "1024194.48541761", "-0.28287417", "0.50677000", "0.49872000", "0.50057000", "0.50117000"],
+  ["BTC_USDT", "25725.53000000", "6074.90520117", "156489295.23543299", "0.09369121", "25889.00000000", "25629.43000000", "25717.69000000", "25747.69000000"],
+  ["LTC_USDT", "63.06000000", "19800.19751964", "1248404.62483421", "0.39802579", "63.63000000", "62.60000000", "63.03000000", "63.06000000"],
+  ["DOGE_USDT", "0.06389400", "26360317.66603325", "1686644.45381961", "0.03131164", "0.06466200", "0.06354300", "0.06384708", "0.06396200"],
+  ["ETH_USDT", "1632.69000000", "7379.92830702", "12057736.03072529", "0.10791388", "1648.02000000", "1625.16000000", "1632.69000000", "1635.28000000"],
+  ["TRX_USDT", "0.07827864", "17930244.99331608", "1392304.80058763", "1.44319315", "0.07857449", "0.07710881", "0.07832800", "0.07842434"],
+  ["USDC_USDT", "1.00130000", "2135117.29179469", "2136330.76840695", "0.08996401", "1.00190090", "0.99929970", "1.00160060", "1.00140000"]
 ]
+```
+
+```python
+from alpcom_api import ws
+await client.subscribe(ws.tps.tickers_all)
+await client.subscribe(ws.tps.tickers_of('BTC_USDT'))
 ```
 
 
@@ -1500,10 +1546,20 @@ Fields:
 ]
 ```
 
+```python
+from alpcom_api import ws
+await client.subscribe(ws.tps.trades_all)
+await client.subscribe(ws.tps.trades_of('BTC_USDT'))
+```
+
 
 ## Rates
 
 Topics: `rates.*`, `rates.XXX_YYY`
+
+The rates channel provides real-time currency exchange rates for a wide range of cryptocurrencies on our platform. 
+It calculates the value of each currency relative to a set of fixed benchmarks, including USDT, EUR, USD, BTC, and ETH. 
+Even if there isn't a direct trading pair, it accurately computes the conversion rate, ensuring users have access to up-to-date and reliable exchange information.
 
 Fields:
 
@@ -1532,6 +1588,13 @@ Each rate is represented as an array with the following fields:
 ]
 ```
 
+```python
+from alpcom_api import ws
+await client.subscribe(ws.tps.rates_all)
+await client.subscribe(ws.tps.rates_of('BTC_USDT'))
+```
+
+
 ## Orderbook Diff
 
 Topics: `diff.XXX_YYY`
@@ -1540,7 +1603,9 @@ Fields:
 
  - `Type`: The type of the message is set to "d," indicating that it's a market depth difference event.
  - `Timestamp`: The Unix timestamp of the market depth difference data.
- - `Payload`: The payload is an array containing market depth difference information. It includes the following fields:
+ - `Payload`: The payload is an array containing market depth difference information. 
+
+Payload includes the following fields:
  - `Symbol`: The trading symbol associated with the market depth.
  - `Asks`: A two-dimensional array representing the updated ask side of the market depth. Each ask is an array with the price and quantity difference.
  - `Bids`: A two-dimensional array representing the updated bid side of the market depth. Each bid is an array with the price and quantity difference.
@@ -1560,6 +1625,12 @@ Fields:
 ```
 
 
+```python
+from alpcom_api import ws
+await client.subscribe(ws.tps.diff_of('BTC_USDT'))
+```
+
+
 ## Market Depth
 
 Topics: `market_depth.XXX_YYY`
@@ -1568,42 +1639,122 @@ Fields:
 
  - `Type`: The type of the message is set to "p," indicating that it's a market depth event.
  - `Timestamp`: The Unix timestamp of the market depth data.
- - `Payload`: The payload is an array containing market depth information
+ - `Payload`: Market depth object.
 
-. It includes the following fields:
+Market depth object includes the following fields:
 
- - A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
- - A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
- - The trading symbol associated with the market depth.
- - TotalAsks: The total quantity of asks.
- - TotalBids: The total quantity of bids.
+ - `Asks`: A two-dimensional array representing the ask side of the market depth. Each ask is an array with the price and quantity.
+ - `Bids`: A two-dimensional array representing the bid side of the market depth. Each bid is an array with the price and quantity.
+ - `Symbol`: The trading symbol associated with the market depth.
+ - `TotalAsks`: The total quantity of asks.
+ - `TotalBids`: The total quantity of bids.
 
 > Example
 
 ```json
 [
   "p",
-  1694004300,
-  [
-    [["100.00", "10.0"], ["101.00", "15.0"]],
-    [["99.00", "8.0"], ["98.50", "5.0"]],
-    "BTC_USDT",
-    "25.0",
-    "13.0"
-  ]
+  1694178331,
+  {
+    "Asks": [
+      [
+        "26100.11000000",
+        "0.30200000"
+      ],
+      [
+        "26149.68000000",
+        "0.51800000"
+      ]
+    ],
+    "Bids": [
+      [
+        "25768.09000000",
+        "0.05900000"
+      ],
+      [
+        "25748.38000000",
+        "0.46300000"
+      ]
+    ],
+    "Symbol": "BTC_USDT",
+    "TotalAsks": "148953.50292677",
+    "TotalBids": "148953.97125366"
+  }
 ]
+```
+
+```python
+from alpcom_api import ws
+await client.subscribe(ws.tps.depth_of('BTC_USDT'))
 ```
 
 ## Auth
 
-Will be available soon
+You can use JWT-token, mentioned above, that is used for access to private API to authorize within web socket connection.
+To make it send next message:
+`["auth", "Generated GWT Token"]`
+
+```python
+cli = clients.ALPAuthClient(
+    key='**API_KEY**',
+    secret='**API_KEY**',
+    token_cache=cache.FileCache('dev_token.txt')
+)
+await client.auth(cli)
+```
 
 
 ## Account Order Update
 
-Will be available soon
+After the authorization, you will receive updates of your orders on trades.
 
+Fields:
+
+ - `Type`: The type of the message is set to "o" indicating that it's an order event.
+ - `Timestamp`: The Unix timestamp of the message.
+ - `Order Id`: The unique identifier for the order.
+ - `Symbol`: The trading symbol associated with the order.
+ - `Side`: The side of the order (e.g., 'buy' or 'sell').
+ - `Order Type`: The type of order (e.g., 'limit' or 'market').
+ - `Base Amount`: The quantity of the base currency in the order.
+ - `Limit Price`: The specified price for a limit order.
+ - `Amount Unfilled`: The quantity of the order that remains unfilled.
+ - `Amount Filled`: The quantity of the order that has been filled.
+ - `Amount Cancelled`: The quantity of the order that has been cancelled.
+ - `Value Filled`: The total value of the order that has been filled.
+ - `Price Avg`: The average price at which the order has been filled.
+ - `Done At`: The timestamp indicating when the order was completed.
+ - `Status`: The current status of the order (e.g., 'open', 'completed', 'cancelled').
+ - `Quote Amount`: The amount in the quote currency.
+ - `Wallet Type`: The type of wallet associated with the order (e.g., 'spot', 'margin').
+ - `Stop Price`: The specified stop price for a stop order.
+ - `Stop Operator`: The operator for the stop price (e.g., 'greater_than', 'less_than').
+
+
+```json
+[
+  [12345, "BTC_UST", "ASK", "LIMIT", "0.5", "48000.00", "0.2", "0.3", "0.0", "14400.00", "48000.00", 1631386242.567, "FILLED", "14400.00", "SPOT", "0.00", ""],
+  [12346, "ETH_USD", "BID", "MARKET", "2.0", "0.00", "0.0", "2.0", "0.0", "3000.00", "1500.00", 1631386300.987, "FILLED", "3000.00", "CROSS_MARGIN", "0.00", ""]
+]
+```
 
 ## Account Wallet Update
 
-Will be available soon
+After the authorization, you will receive updates of your balances after each change.
+
+Fields:
+
+ - `Type`: The type of the message is set to "o" indicating that it's an order event.
+ - `Timestamp`: The Unix timestamp of the message.
+ - `Code`: Represents the unique code associated with the item.
+ - `Wallet Type`: Indicates the type of wallet  (e.g., 'spot', 'margin').
+ - `Symbol`: Denotes the symbol of margin isolated wallet.
+ - `Balance`: Reflects the current balance of the wallet.
+ - `Reserve`: Specifies the reserved amount for the wallet.
+
+```json
+[
+  ["USDT", "SPOT", "", "5.0", "1.0"],
+  ["BTC", "SPOT", "", "10.0", "2.0"]
+]
+```
