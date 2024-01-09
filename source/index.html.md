@@ -217,7 +217,7 @@ public_api.ticker()
 
 ## Orderbook
 
-`GET /api/v3/order_book`
+`GET /api/v3/orderbook`
 
 Query Parameters
 
